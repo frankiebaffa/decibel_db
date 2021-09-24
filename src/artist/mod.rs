@@ -3,7 +3,7 @@ use crate::{
     db::DbConnection,
     sql_utils::value,
 };
-struct Artist {
+pub struct Artist {
     id: i64,
     name: String,
     bio: String,
@@ -11,7 +11,7 @@ struct Artist {
     createddate: DateTime<Local>,
     lasteditdate: DateTime<Local>,
 }
-const GET_ALL_SQL: &'static str = include_str!("./sql/artist/get_all.sql");
+const GET_ALL_SQL: &'static str = include_str!("./sql/get_all.sql");
 impl Artist {
     pub fn get_all(db: &mut DbConnection) -> Result<Vec<Artist>, rusqlite::Error> {
         let c = db.get_connection();

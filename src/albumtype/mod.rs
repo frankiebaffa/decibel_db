@@ -3,7 +3,7 @@ use crate::{
     db::DbConnection,
     sql_utils::value,
 };
-struct AlbumType {
+pub struct AlbumType {
     id: i64,
     name: String,
     description: String,
