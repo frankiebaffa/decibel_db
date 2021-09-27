@@ -1,4 +1,4 @@
 select count(name)
-from BangersDb.sqlite_master
+from DecibelDb.sqlite_master
 where type = 'index'
 and name = 'AlbumTracksUnique';

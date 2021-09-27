@@ -1,2 +1,2 @@
 delete
-from BangersDb.ArtistTypes;
+from DecibelDb.ArtistTypes;

@@ -1,3 +1,3 @@
 select count(*)
-from BangersDb.ArtistTypes
+from DecibelDb.ArtistTypes
 limit 1;

@@ -1,4 +1,4 @@
-insert into BangersDb.Artists
+insert into DecibelDb.Artists
 	(
 		Name
 	,	Bio

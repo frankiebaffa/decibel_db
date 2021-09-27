@@ -1,1 +1,1 @@
-drop index BangersDb.AlbumTracksUnique;
+drop index DecibelDb.AlbumTracksUnique;

@@ -1,4 +1,4 @@
 select artype.*
-from BangersDb.ArtistType as artype
+from DecibelDb.ArtistType as artype
 where artype.Name = :name
 ane artype.Active = 1;

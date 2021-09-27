@@ -1,1 +1,1 @@
-drop table BangersDb.Files;
+drop table DecibelDb.Files;

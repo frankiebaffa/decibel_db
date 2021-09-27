@@ -1,4 +1,4 @@
-insert into BangersDb.ArtistTypes
+insert into DecibelDb.ArtistTypes
 	(
 		Name
 	,	Descriptor

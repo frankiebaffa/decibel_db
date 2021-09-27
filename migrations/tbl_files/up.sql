@@ -1,4 +1,4 @@
-create table BangersDb.Files
+create table DecibelDb.Files
 	(
 		Id integer not null primary key autoincrement
 	,	FileBlob blob not null

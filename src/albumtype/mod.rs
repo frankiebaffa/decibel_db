@@ -1,8 +1,5 @@
 use chrono::{DateTime, Local};
-use crate::{
-    db::DbConnection,
-    sql_utils::value,
-};
+use crate::sql_utils::value;
 pub struct AlbumType {
     id: i64,
     name: String,

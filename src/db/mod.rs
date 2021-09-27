@@ -1,16 +1,31 @@
 use crate::context::Context;
 use rusqlite::Connection;
-pub struct DbConnection {
-    connection: Connection,
-}
-impl DbConnection {
-    pub fn init(context: &Context) -> Result<DbConnection, rusqlite::Error> {
-        let c = Connection::open(context.get_path_to_db())?;
-        c.execute("attach 'BangersDb.db' as BangersDb", [])?;
-        return Ok(DbConnection { connection: c });
+pub struct Db {}
+impl Db {
+    pub fn attach_temp_db<'db>(connection: &'db mut Connection, context: &Context) -> Result<&'db mut Connection, rusqlite::Error> {
+        let db_name = context.get_db_name();
+        connection.execute(
+            &format!(
+                "attach ':memory:' as {}",
+                db_name
+            ),
+            []
+        )?;
+        return Ok(connection);
     }
-    pub fn get_connection(&mut self) -> &mut Connection {
-        return &mut self.connection;
+    pub fn attach_db<'db>(connection: &'db mut Connection, context: &Context) -> Result<&'db mut Connection, rusqlite::Error> {
+        let db_path = context.get_db_path();
+        let db_name = context.get_db_name();
+        connection.execute(
+            &format!(
+                "attach '{}/{}.db' as {}",
+                db_path,
+                db_name,
+                db_name
+            ),
+            []
+        )?;
+        return Ok(connection);
     }
 }
 

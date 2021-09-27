@@ -1,5 +1,5 @@
 use chrono::{DateTime, Local};
-use crate::{db::DbConnection, sql_utils::value};
+use crate::sql_utils::value;
 struct AlbumTrackArtist {
     id: i64,
     artist_id: i64,

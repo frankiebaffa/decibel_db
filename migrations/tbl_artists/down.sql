@@ -1,1 +1,1 @@
-drop table BangersDb.Artists;
+drop table DecibelDb.Artists;

@@ -1,23 +1,24 @@
 use migaton::Migrator;
-use bangers_db::constants;
+use decibel_db::{constants, db::Db, context::Context};
 fn main() {
     match dotenv::dotenv() {
         Ok(_) => {},
         Err(_) => {},
     };
-    let db_path = match std::env::var(constants::BANGERS_DB_PATH) {
+    let db_path = match std::env::var(constants::DECIBEL_DB_PATH_KEY) {
         Ok(db_path) => db_path,
         Err(e) => panic!("{}", e),
     };
-    let db_name = match std::env::var(constants::BANGERS_DB_NAME) {
-        Ok(db_name) => db_name,
-        Err(e) => panic!("{}", e),
-    };
-    let mig_path = match std::env::var(constants::BANGERS_MIGRATION_PATH) {
+    let mig_path = match std::env::var(constants::DECIBEL_MIGRATION_PATH_KEY) {
         Ok(mig_path) => mig_path,
         Err(e) => panic!("{}", e),
     };
-    let skips = match Migrator::do_up(mig_path.as_str(), &db_path, &db_name) {
+    let ctx = Context::init().unwrap();
+    let mut mem_c = rusqlite::Connection::open(":memory:").unwrap();
+    Db::attach_temp_db(&mut mem_c, &ctx).unwrap();
+    let mut c = rusqlite::Connection::open(":memory:").unwrap();
+    Db::attach_db(&mut c, &ctx).unwrap();
+    let skips = match Migrator::do_up(&mut mem_c, &mut c, &mig_path) {
         Ok(res) => res,
         Err(e) => panic!("{}", e),
     };

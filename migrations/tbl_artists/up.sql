@@ -1,4 +1,4 @@
-create table BangersDb.Artists
+create table DecibelDb.Artists
 	(
 		Id integer not null primary key autoincrement
 	,	Name text not null

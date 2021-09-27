@@ -1,1 +1,1 @@
-create unique index BangersDb.ArtistsNameUnique on Artists (Name) where Active = 1;
+create unique index DecibelDb.ArtistsNameUnique on Artists (Name) where Active = 1;

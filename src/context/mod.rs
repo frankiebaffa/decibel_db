@@ -11,19 +11,19 @@ impl Context {
             Ok(_) => {},
             Err(_) => {},
         }
-        let db_path = match env::var(constants::BANGERS_DB_PATH) {
+        let db_path = match env::var(constants::DECIBEL_DB_PATH_KEY) {
             Ok(db_path) => db_path,
             Err(e) => return Err(e),
         };
-        let db_name = match env::var(constants::BANGERS_DB_NAME) {
-            Ok(db_name) => db_name,
-            Err(e) => return Err(e),
-        };
-        let migration_path = match env::var(constants::BANGERS_MIGRATION_PATH) {
+        let migration_path = match env::var(constants::DECIBEL_MIGRATION_PATH_KEY) {
             Ok(migration_path) => migration_path,
             Err(e) => return Err(e),
         };
-        return Ok(Context { db_path, db_name, migration_path });
+        return Ok(Context {
+            db_path,
+            db_name: String::from(constants::DECIBEL_DB_NAME),
+            migration_path,
+        });
     }
     pub fn get_path_to_db(&self) -> String {
         return if self.db_path.ends_with("/") {

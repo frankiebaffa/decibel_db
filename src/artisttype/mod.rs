@@ -1,8 +1,6 @@
 use chrono::{DateTime, Local};
-use crate::{
-    db::DbConnection,
-    sql_utils::value,
-};
+use crate::sql_utils::value;
+use rusqlite::Connection;
 pub struct ArtistType {
     id: i64,
     name: String,
@@ -28,9 +26,8 @@ impl ArtistType {
         let lasteditdate = value(row, "LastEditDate")?;
         return Ok(ArtistType { id, name, descriptor, description, active, createddate, lasteditdate });
     }
-    pub fn get_by_name<'a>(db: &mut DbConnection, name: &'a str) -> Result<Self, rusqlite::Error> {
+    pub fn get_by_name<'a>(c: &mut Connection, name: &'a str) -> Result<Self, rusqlite::Error> {
         const GET_BY_NAME_SQL: &'static str = include_str!("./sql/get_by_name.sql");
-        let c = db.get_connection();
         let mut stmt = c.prepare(GET_BY_NAME_SQL)?;
         return stmt.query_row(rusqlite::named_params!{ ":name": name }, |row| {
             Self::get_by_row(&row)

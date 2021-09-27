@@ -1,6 +1,5 @@
 use chrono::{DateTime, Local};
-use crate::{db::DbConnection, sql_utils::value};
-struct Song {
+pub struct Song {
     id: i64,
     name: String,
     blurb: String,
