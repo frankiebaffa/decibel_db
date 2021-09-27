@@ -1,5 +1,8 @@
 use chrono::{DateTime, Local};
-use crate::sql_utils::value;
+use crate::{
+    db::DbModel,
+    sql_utils::value,
+};
 use rusqlite::Connection;
 pub struct Artist {
     id: i64,
@@ -9,8 +12,8 @@ pub struct Artist {
     createddate: DateTime<Local>,
     lasteditdate: DateTime<Local>,
 }
-impl Artist {
-    fn get_by_row(row: &rusqlite::Row) -> Result<Self, rusqlite::Error> {
+impl DbModel<Artist> for Artist {
+    fn from_row(row: &rusqlite::Row) -> Result<Self, rusqlite::Error> {
         let id = value(row, "Id")?;
         let name = value(row, "Name")?;
         let bio = value(row, "Bio")?;
@@ -19,6 +22,8 @@ impl Artist {
         let lasteditdate = value(row, "LastEditDate")?;
         Ok(Self { id, name, bio, active, createddate, lasteditdate })
     }
+}
+impl Artist {
     pub fn insert_new<'a>(c: &mut Connection, name: &'a str, bio: &'a str, active: bool) -> Result<Self, rusqlite::Error> {
         const INSERT_NEW_SQL: &'static str = include_str!("./sql/insert_new.sql");
         let new_id;
@@ -34,7 +39,7 @@ impl Artist {
         const GET_ALL_SQL: &'static str = include_str!("./sql/get_all.sql");
         let mut stmt = c.prepare(GET_ALL_SQL)?;
         let artists = stmt.query_map([], |row| {
-            Self::get_by_row(&row)
+            Self::from_row(&row)
         })?.into_iter().collect();
         return artists;
     }
@@ -42,14 +47,14 @@ impl Artist {
         const GET_BY_ID_SQL: &'static str = include_str!("./sql/get_by_id.sql");
         let mut stmt = c.prepare(GET_BY_ID_SQL)?;
         return stmt.query_row(&[(":id", &id)], |row| {
-            Self::get_by_row(&row)
+            Self::from_row(&row)
         });
     }
     pub fn get_by_name<'a>(c: &mut Connection, name: &'a str) -> Result<Self, rusqlite::Error> {
         const GET_BY_NAME_SQL: &'static str = include_str!("./sql/get_by_name.sql");
         let mut stmt = c.prepare(GET_BY_NAME_SQL)?;
         return stmt.query_row(&[(":name", name)], |row| {
-            Self::get_by_row(&row)
+            Self::from_row(&row)
         });
     }
 }

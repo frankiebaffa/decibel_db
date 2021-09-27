@@ -1,5 +1,8 @@
 use crate::context::Context;
 use rusqlite::Connection;
+pub trait DbModel<T> {
+    fn from_row(row: &rusqlite::Row) -> Result<T, rusqlite::Error>;
+}
 pub struct Db {}
 impl Db {
     pub fn attach_temp_db<'db>(connection: &'db mut Connection, context: &Context) -> Result<&'db mut Connection, rusqlite::Error> {
