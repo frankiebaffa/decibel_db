@@ -2,6 +2,7 @@ ordering: [
   tbl_artists,
   idx_artistsname,
   tbl_artisttypes,
+  ins_artisttypes,
   idx_artisttypesname,
   tbl_albumtypes,
   idx_albumtypesname,

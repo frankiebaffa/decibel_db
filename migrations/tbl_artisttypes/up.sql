@@ -8,23 +8,3 @@ create table BangersDb.ArtistTypes
 	,	CreatedDate text not null default current_timestamp
 	,	LastEditDate text not null default current_timestamp
 	);
-insert into BangersDb.ArtistTypes
-	(
-		Name
-	,	Descriptor
-	)
-select 'Performer'
-,	'Performed by'
-union all
-select 'Writer'
-,	'Written by'
-union all
-select 'Composer'
-,	'Composed by'
-union all
-select 'Producer'
-,	'Produced by'
-union all
-select 'Feature'
-,	'Featuring'
-
