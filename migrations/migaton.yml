@@ -1,0 +1,17 @@
+ordering: [
+  tbl_artists,
+  idx_artistsname,
+  tbl_artisttypes,
+  idx_artisttypesname,
+  tbl_albumtypes,
+  idx_albumtypesname,
+  tbl_albums,
+  tbl_albumartists,
+  idx_albumartistsunique,
+  tbl_songs,
+  tbl_files,
+  tbl_albumtracks,
+  idx_albumtracksunique,
+  tbl_albumtrackartists,
+  idx_albumtrackartistsunique,
+]
