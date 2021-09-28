@@ -1,9 +1,10 @@
 use rusqlite::{
     Error,
-    Row
+    Row,
 };
 pub trait DbModel: Sized {
     const TABLE: &'static str;
     const ALIAS: &'static str;
+    const COLUMNS: &'static [str];
     fn from_row(row: &Row) -> Result<Self, Error>;
 }

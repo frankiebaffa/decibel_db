@@ -30,6 +30,9 @@ pub struct Artist {
 impl DbModel for Artist {
     const TABLE: &'static str = "DecibelDb.Artists";
     const ALIAS: &'static str = "artist";
+    const COLUMNS: &'static [str] = &[
+        "Id", "Name", "Bio", "Active", "CreatedDate", "LastEditDate",
+    ];
     fn from_row(row: &Row) -> Result<Self, Error> {
         let id = row.value("Id")?;
         let name = row.value("Name")?;
@@ -63,13 +66,5 @@ impl Artist {
             new_id = stmt.insert(named_params!{ ":name": name, ":bio": bio, ":active": active })?;
         }
         return Self::get_by_id(c, new_id);
-    }
-    pub fn get_all(c: &mut Connection) -> Result<Vec<Self>, Error> {
-        const GET_ALL_SQL: &'static str = include_str!("./sql/get_all.sql");
-        let mut stmt = c.prepare(GET_ALL_SQL)?;
-        let artists = stmt.query_map([], |row| {
-            Self::from_row(&row)
-        })?.into_iter().collect();
-        return artists;
     }
 }

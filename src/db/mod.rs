@@ -1,6 +1,6 @@
+pub mod traits;
 use crate::context::Context;
 use rusqlite::Connection;
-pub mod traits;
 pub struct Db {}
 impl Db {
     pub fn attach_temp_db<'db>(connection: &'db mut Connection, context: &Context) -> Result<&'db mut Connection, rusqlite::Error> {
