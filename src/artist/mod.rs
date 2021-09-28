@@ -1,6 +1,13 @@
 use chrono::{DateTime, Local};
 use crate::{
-    db::DbModel,
+    db::traits::{
+        dbmodel::DbModel,
+        primarykey::{
+            PrimaryKey,
+            PrimaryKeyModel,
+        },
+        uniquename::UniqueName,
+    },
     sql_utils::value,
 };
 use rusqlite::Connection;
@@ -12,7 +19,7 @@ pub struct Artist {
     createddate: DateTime<Local>,
     lasteditdate: DateTime<Local>,
 }
-impl DbModel<Artist> for Artist {
+impl DbModel for Artist {
     fn from_row(row: &rusqlite::Row) -> Result<Self, rusqlite::Error> {
         let id = value(row, "Id")?;
         let name = value(row, "Name")?;
@@ -21,6 +28,19 @@ impl DbModel<Artist> for Artist {
         let createddate = value(row, "CreatedDate")?;
         let lasteditdate = value(row, "LastEditDate")?;
         Ok(Self { id, name, bio, active, createddate, lasteditdate })
+    }
+}
+impl PrimaryKey for Artist {
+    fn get_by_id_sql() -> &'static str {
+        return include_str!("./sql/get_by_id.sql");
+    }
+    fn get_id(&self) -> i64 {
+        return self.id;
+    }
+}
+impl UniqueName for Artist {
+    fn get_by_name_sql() -> &'static str {
+        return include_str!("./sql/get_by_name.sql");
     }
 }
 impl Artist {
@@ -42,19 +62,5 @@ impl Artist {
             Self::from_row(&row)
         })?.into_iter().collect();
         return artists;
-    }
-    pub fn get_by_id<'a>(c: &mut Connection, id: i64) -> Result<Self, rusqlite::Error> {
-        const GET_BY_ID_SQL: &'static str = include_str!("./sql/get_by_id.sql");
-        let mut stmt = c.prepare(GET_BY_ID_SQL)?;
-        return stmt.query_row(&[(":id", &id)], |row| {
-            Self::from_row(&row)
-        });
-    }
-    pub fn get_by_name<'a>(c: &mut Connection, name: &'a str) -> Result<Self, rusqlite::Error> {
-        const GET_BY_NAME_SQL: &'static str = include_str!("./sql/get_by_name.sql");
-        let mut stmt = c.prepare(GET_BY_NAME_SQL)?;
-        return stmt.query_row(&[(":name", name)], |row| {
-            Self::from_row(&row)
-        });
     }
 }
