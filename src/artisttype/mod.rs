@@ -1,11 +1,11 @@
-use chrono::{DateTime, Local};
-use crate::{
-    db::traits::{
+use {
+    chrono::{DateTime, Local},
+    crate::db::traits::{
         dbmodel::DbModel,
+        helpers::ColumnValue,
         primarykey::PrimaryKey,
         uniquename::UniqueName,
     },
-    sql_utils::value
 };
 pub struct ArtistType {
     id: i64,
@@ -17,28 +17,29 @@ pub struct ArtistType {
     lasteditdate: DateTime<Local>,
 }
 impl DbModel for ArtistType {
+    const TABLE: &'static str = "DecibelDb.AristType";
+    const ALIAS: &'static str = "artisttype";
     fn from_row(row: &rusqlite::Row) -> Result<Self, rusqlite::Error> {
-        let id = value(row, "Id")?;
-        let name = value(row, "Name")?;
-        let descriptor = value(row, "Descriptor")?;
-        let description = value(row, "Description")?;
-        let active = value(row, "Active")?;
-        let createddate = value(row, "CreatedDate")?;
-        let lasteditdate = value(row, "LastEditDate")?;
+        let id = row.value("Id")?;
+        let name = row.value("Name")?;
+        let descriptor = row.value("Descriptor")?;
+        let description = row.value("Description")?;
+        let active = row.value("Active")?;
+        let createddate = row.value("CreatedDate")?;
+        let lasteditdate = row.value("LastEditDate")?;
         return Ok(ArtistType { id, name, descriptor, description, active, createddate, lasteditdate });
     }
 }
 impl PrimaryKey for ArtistType {
-    fn get_by_id_sql() -> &'static str {
-        return include_str!("./sql/get_by_id.sql");
-    }
+    const PRIMARY_KEY: &'static str = "Id";
     fn get_id(&self) -> i64 {
         return self.id;
     }
 }
 impl UniqueName for ArtistType {
-    fn get_by_name_sql() -> &'static str {
-        return include_str!("./sql/get_by_name.sql");
+    const NAME: &'static str = "Name";
+    fn get_name(&self) -> String {
+        return self.name.clone();
     }
 }
 impl ArtistType {

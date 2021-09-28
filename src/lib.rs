@@ -10,5 +10,4 @@ pub mod context;
 pub mod db;
 pub mod file;
 pub mod song;
-pub mod sql_utils;
 

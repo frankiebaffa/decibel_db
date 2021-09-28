@@ -1,19 +1,19 @@
-use chrono::{
-    DateTime,
-    Local
-};
-use crate::{
-    db::traits::{
+use {
+    chrono::{
+        DateTime,
+        Local
+    },
+    crate::db::traits::{
         activeflag::ActiveFlag,
         dbmodel::DbModel,
+        helpers::ColumnValue,
         primarykey::PrimaryKey,
         uniquename::UniqueName,
     },
-    sql_utils::value,
-};
-use rusqlite::{
-    Error,
-    Row,
+    rusqlite::{
+        Error,
+        Row,
+    },
 };
 pub struct AlbumType {
     id: i64,
@@ -24,31 +24,33 @@ pub struct AlbumType {
     lasteditdate: DateTime<Local>,
 }
 impl DbModel for AlbumType {
+    const TABLE: &'static str = "DecibelDb.AlbumType";
+    const ALIAS: &'static str = "albumtype";
     fn from_row(row: &Row) -> Result<Self, Error> {
-        let id = value(row, "Id")?;
-        let name = value(row, "Name")?;
-        let description = value(row, "Description")?;
-        let active = value(row, "Active")?;
-        let createddate = value(row, "CreatedDate")?;
-        let lasteditdate = value(row, "LastEditDate")?;
+        let id = row.value("Id")?;
+        let name = row.value("Name")?;
+        let description = row.value("Description")?;
+        let active = row.value("Active")?;
+        let createddate = row.value("CreatedDate")?;
+        let lasteditdate = row.value("LastEditDate")?;
         return Ok(AlbumType { id, name, description, active, createddate, lasteditdate });
     }
 }
 impl PrimaryKey for AlbumType {
-    fn get_by_id_sql() -> &'static str {
-        return include_str!("./sql/get_by_id.sql");
-    }
+    const PRIMARY_KEY: &'static str = "Id";
     fn get_id(&self) -> i64 {
         return self.id;
     }
 }
 impl UniqueName for AlbumType {
-    fn get_by_name_sql() -> &'static str {
-        return include_str!("./sql/get_by_name.sql");
+    const NAME: &'static str = "Name";
+    fn get_name(&self) -> String {
+        return self.name.clone();
     }
 }
 impl ActiveFlag for AlbumType {
-    fn get_all_active_sql() -> &'static str {
-        return include_str!("./sql/get_all_active.sql");
+    const ACTIVE: &'static str = "Active";
+    fn get_active(&self) -> bool {
+        return self.active;
     }
 }

@@ -1,20 +1,22 @@
-use chrono::{
-    DateTime,
-    Local,
-};
-use crate::{
-    albumtype::AlbumType,
-    db::traits::{
-        activeflag::ActiveFlag,
-        dbmodel::DbModel,
-        primarykey::PrimaryKey,
-        foreignkey::ForeignKey,
+use {
+    chrono::{
+        DateTime,
+        Local,
     },
-    sql_utils::value,
-};
-use rusqlite::{
-    Error,
-    Row,
+    crate::{
+        albumtype::AlbumType,
+        db::traits::{
+            activeflag::ActiveFlag,
+            dbmodel::DbModel,
+            foreignkey::ForeignKey,
+            helpers::ColumnValue,
+            primarykey::PrimaryKey,
+        },
+    },
+    rusqlite::{
+        Error,
+        Row,
+    },
 };
 pub struct Album {
     id: i64,
@@ -26,41 +28,35 @@ pub struct Album {
     lasteditdate: DateTime<Local>,
 }
 impl DbModel for Album {
+    const TABLE: &'static str = "DecibelDb.Album";
+    const ALIAS: &'static str = "album";
     fn from_row(row: &Row) -> Result<Self, Error> {
-        let id = value(row, "Id")?;
-        let albumtype_id = value(row, "AlbumType_Id")?;
-        let name = value(row, "Name")?;
-        let blurb = value(row, "Blurb")?;
-        let active = value(row, "Active")?;
-        let createddate = value(row, "CreatedDate")?;
-        let lasteditdate = value(row, "LastEditDate")?;
+        let id = row.value("Id")?;
+        let albumtype_id = row.value("AlbumType_Id")?;
+        let name = row.value("Name")?;
+        let blurb = row.value("Blurb")?;
+        let active = row.value("Active")?;
+        let createddate = row.value("CreatedDate")?;
+        let lasteditdate = row.value("LastEditDate")?;
         Ok(Self { id, albumtype_id, name, blurb, active, createddate, lasteditdate })
     }
 }
 impl PrimaryKey for Album {
-    fn get_by_id_sql() -> &'static str {
-        return include_str!("./sql/get_by_id.sql");
-    }
+    const PRIMARY_KEY: &'static str = "Id";
     fn get_id(&self) -> i64 {
         return self.id;
     }
 }
 impl ActiveFlag for Album {
-    fn get_all_active_sql() -> &'static str {
-        return include_str!("./sql/get_all_active.sql");
+    const ACTIVE: &'static str = "Active";
+    fn get_active(&self) -> bool {
+        return self.active;
     }
 }
 impl ForeignKey<AlbumType> for Album {
-    fn get_fk_name() -> &'static str {
-        return ":albumtype_id";
-    }
+    const FOREIGN_KEY: &'static str = "AlbumType_Id";
+    const FOREIGN_KEY_PARAM: &'static str = ":albumtype_id";
     fn get_fk_value(&self) -> i64 {
         return self.albumtype_id;
-    }
-    fn get_all_by_fk_sql() -> &'static str {
-        return include_str!("./sql/get_all_by_albumtype_id.sql");
-    }
-    fn get_fk_sql() -> &'static str {
-        return include_str!("./sql/get_albumtype.sql");
     }
 }
