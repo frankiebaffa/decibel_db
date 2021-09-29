@@ -6,34 +6,25 @@ use {
     worm::traits::{
         activeflag::ActiveFlag,
         dbmodel::DbModel,
-        helpers::ColumnValue,
         primarykey::PrimaryKey,
     },
-    rusqlite::{
-        Error,
-        Row,
-    },
+    worm_derive::Worm,
 };
+#[derive(Worm)]
+#[dbmodel(table(db="DecibelDb",name="Songs",alias="song"))]
 pub struct Song {
+    #[dbcolumn(column(name="Id"))]
     id: i64,
+    #[dbcolumn(column(name="Name"))]
     name: String,
+    #[dbcolumn(column(name="Blurb"))]
     blurb: String,
+    #[dbcolumn(column(name="Active"))]
     active: bool,
+    #[dbcolumn(column(name="CreatedDate"))]
     createddate: DateTime<Local>,
+    #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
-}
-impl DbModel for Song {
-    const TABLE: &'static str = "DecibelDb.Songs";
-    const ALIAS: &'static str = "song";
-    fn from_row(row: &Row) -> Result<Self, Error> {
-        let id = row.value("Id")?;
-        let name = row.value("Name")?;
-        let blurb = row.value("Blurb")?;
-        let active = row.value("Active")?;
-        let createddate = row.value("CreatedDate")?;
-        let lasteditdate = row.value("LastEditDate")?;
-        Ok(Song { id, name, blurb, active, createddate, lasteditdate })
-    }
 }
 impl PrimaryKey for Song {
     const PRIMARY_KEY: &'static str = "Id";

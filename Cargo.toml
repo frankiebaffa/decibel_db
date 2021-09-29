@@ -2,16 +2,14 @@
 name = "decibel_db"
 version = "0.1.0"
 edition = "2018"
+
 [[bin]]
 name = "migrate_up"
 path = "./src/bin/migrate_up.rs"
+
 [[bin]]
 name = "migrate_down"
 path = "./src/bin/migrate_down.rs"
-[[bin]]
-name = "derive_test"
-path = "./src/bin/derive_test.rs"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 chrono = "0.4"

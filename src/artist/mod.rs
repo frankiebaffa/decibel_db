@@ -5,29 +5,13 @@ use {
     },
     worm::traits::{
         dbmodel::DbModel,
-        helpers::ColumnValue,
-        primarykey::{
-            PrimaryKey,
-            PrimaryKeyModel,
-        },
+        primarykey::PrimaryKey,
         uniquename::UniqueName,
-    },
-    rusqlite::{
-        Connection,
-        Error,
-        Row,
-        named_params,
     },
     worm_derive::Worm,
 };
-pub trait DbModel2 {
-    const DB: &'static str;
-    const TABLE: &'static str;
-    const ALIAS: &'static str;
-    fn from_row2();
-}
 #[derive(Worm)]
-#[dbmodel(table(db="DecibelDb", name="Artists", alias="artist"))]
+#[dbmodel(table(db="DecibelDb", name="Artists", alias="artist", bool_flag="Active"))]
 pub struct Artist {
     #[dbcolumn(column(name="Id"))]
     id: i64,
@@ -42,19 +26,6 @@ pub struct Artist {
     #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
 }
-impl DbModel for Artist {
-    const TABLE: &'static str = "DecibelDb.Artists";
-    const ALIAS: &'static str = "artist";
-    fn from_row(row: &Row) -> Result<Self, Error> {
-        let id = row.value("Id")?;
-        let name = row.value("Name")?;
-        let bio = row.value("Bio")?;
-        let active = row.value("Active")?;
-        let createddate = row.value("CreatedDate")?;
-        let lasteditdate = row.value("LastEditDate")?;
-        Ok(Self { id, name, bio, active, createddate, lasteditdate })
-    }
-}
 impl PrimaryKey for Artist {
     const PRIMARY_KEY: &'static str = "Id";
     fn get_id(&self) -> i64 {
@@ -68,8 +39,8 @@ impl UniqueName for Artist {
     }
 }
 impl Artist {
-    pub fn row<'a>() {
-        return Artist::from_row2();
+    pub fn row<'a>(row: &rusqlite::Row) -> Result<Artist, rusqlite::Error> {
+        return Artist::from_row(row);
     }
     //pub fn insert_new<'a>(c: &mut Connection, name: &'a str, bio: &'a str, active: bool) -> Result<Self, Error> {
     //    const INSERT_NEW_SQL: &'static str = include_str!("./sql/insert_new.sql");

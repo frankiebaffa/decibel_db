@@ -4,9 +4,9 @@
 	branch = master
 [submodule "worm_derive"]
 	path = worm_derive
-	url = https://github.com/frankiebaffa/worm_derive
+	url = github:frankiebaffa/worm_derive
 	branch = master
 [submodule "worm"]
 	path = worm
-	url = https://github.com/frankiebaffa/worm
+	url = github:frankiebaffa/worm
 	branch = master

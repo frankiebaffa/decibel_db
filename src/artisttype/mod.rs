@@ -2,33 +2,28 @@ use {
     chrono::{DateTime, Local},
     worm::traits::{
         dbmodel::DbModel,
-        helpers::ColumnValue,
         primarykey::PrimaryKey,
         uniquename::UniqueName,
     },
+    worm_derive::Worm,
 };
+#[derive(Worm)]
+#[dbmodel(table(db="DecibelDb",name="ArtistTypes",alias="artisttypes"))]
 pub struct ArtistType {
+    #[dbcolumn(column(name="Id"))]
     id: i64,
+    #[dbcolumn(column(name="Name"))]
     name: String,
+    #[dbcolumn(column(name="Descriptor"))]
     descriptor: String,
+    #[dbcolumn(column(name="Description"))]
     description: String,
+    #[dbcolumn(column(name="Active"))]
     active: bool,
+    #[dbcolumn(column(name="CreatedDate"))]
     createddate: DateTime<Local>,
+    #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
-}
-impl DbModel for ArtistType {
-    const TABLE: &'static str = "DecibelDb.AristType";
-    const ALIAS: &'static str = "artisttype";
-    fn from_row(row: &rusqlite::Row) -> Result<Self, rusqlite::Error> {
-        let id = row.value("Id")?;
-        let name = row.value("Name")?;
-        let descriptor = row.value("Descriptor")?;
-        let description = row.value("Description")?;
-        let active = row.value("Active")?;
-        let createddate = row.value("CreatedDate")?;
-        let lasteditdate = row.value("LastEditDate")?;
-        return Ok(ArtistType { id, name, descriptor, description, active, createddate, lasteditdate });
-    }
 }
 impl PrimaryKey for ArtistType {
     const PRIMARY_KEY: &'static str = "Id";

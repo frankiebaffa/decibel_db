@@ -7,31 +7,22 @@ use {
         activeflag::ActiveFlag,
         dbmodel::DbModel,
         primarykey::PrimaryKey,
-        helpers::ColumnValue,
     },
-    rusqlite::{
-        Error,
-        Row,
-    },
+    worm_derive::Worm,
 };
+#[derive(Worm)]
+#[dbmodel(table(db="DecibelDb",name="Files",alias="file"))]
 struct File {
+    #[dbcolumn(column(name="Id"))]
     id: i64,
+    #[dbcolumn(column(name="FileBlob"))]
     fileblob: Vec<u8>,
+    #[dbcolumn(column(name="Active"))]
     active: bool,
+    #[dbcolumn(column(name="CreatedDate"))]
     createddate: DateTime<Local>,
+    #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
-}
-impl DbModel for File {
-    const TABLE: &'static str = "DecibelDb.Files";
-    const ALIAS: &'static str = "file";
-    fn from_row(row: &Row) -> Result<File, Error> {
-        let id = row.value("Id")?;
-        let fileblob = row.value("FileBlob")?;
-        let active = row.value("Active")?;
-        let createddate = row.value("CreatedDate")?;
-        let lasteditdate = row.value("LastEditDate")?;
-        Ok(File { id, fileblob, active, createddate, lasteditdate })
-    }
 }
 impl PrimaryKey for File {
     const PRIMARY_KEY: &'static str = "Id";

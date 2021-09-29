@@ -12,36 +12,27 @@ use {
         activeflag::ActiveFlag,
         dbmodel::DbModel,
         foreignkey::ForeignKey,
-        helpers::ColumnValue,
         primarykey::PrimaryKey,
     },
-    rusqlite::{
-        Error,
-        Row,
-    },
+    worm_derive::Worm,
 };
+#[derive(Worm)]
+#[dbmodel(table(db="DecibelDb",name="AlbumArtists",alias="albumartist"))]
 pub struct AlbumArtist {
+    #[dbcolumn(column(name="Id"))]
     id: i64,
+    #[dbcolumn(column(name="Artist_Id"))]
     artist_id: i64,
+    #[dbcolumn(column(name="Album_Id"))]
     album_id: i64,
+    #[dbcolumn(column(name="ArtistType_Id"))]
     artisttype_id: i64,
+    #[dbcolumn(column(name="Active"))]
     active: bool,
+    #[dbcolumn(column(name="CreatedDate"))]
     createddate: DateTime<Local>,
+    #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
-}
-impl DbModel for AlbumArtist {
-    const TABLE: &'static str = "DecibelDb.AlbumArtist";
-    const ALIAS: &'static str = "albumartist";
-    fn from_row(row: &Row) -> Result<Self, Error> {
-        let id = row.value("Id")?;
-        let artist_id = row.value("Artist_Id")?;
-        let album_id = row.value("Album_Id")?;
-        let artisttype_id = row.value("ArtistType_Id")?;
-        let active = row.value("Active")?;
-        let createddate = row.value("CreatedDate")?;
-        let lasteditdate = row.value("LastEditDate")?;
-        Ok(AlbumArtist { id, artist_id, album_id, artisttype_id, active, createddate, lasteditdate })
-    }
 }
 impl PrimaryKey for AlbumArtist {
     const PRIMARY_KEY: &'static str = "Id";
