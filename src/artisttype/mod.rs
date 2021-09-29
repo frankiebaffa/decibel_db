@@ -1,6 +1,6 @@
 use {
     chrono::{DateTime, Local},
-    crate::db::traits::{
+    worm::traits::{
         dbmodel::DbModel,
         helpers::ColumnValue,
         primarykey::PrimaryKey,

@@ -3,7 +3,7 @@ use {
         DateTime,
         Local,
     },
-    crate::db::traits::{
+    worm::traits::{
         activeflag::ActiveFlag,
         dbmodel::DbModel,
         helpers::ColumnValue,

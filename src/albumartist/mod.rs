@@ -7,13 +7,13 @@ use {
         artist::Artist,
         album::Album,
         artisttype::ArtistType,
-        db::traits::{
-            activeflag::ActiveFlag,
-            dbmodel::DbModel,
-            foreignkey::ForeignKey,
-            helpers::ColumnValue,
-            primarykey::PrimaryKey,
-        },
+    },
+    worm::traits::{
+        activeflag::ActiveFlag,
+        dbmodel::DbModel,
+        foreignkey::ForeignKey,
+        helpers::ColumnValue,
+        primarykey::PrimaryKey,
     },
     rusqlite::{
         Error,

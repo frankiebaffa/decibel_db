@@ -3,7 +3,7 @@ use {
         DateTime,
         Local,
     },
-    crate::db::traits::{
+    worm::traits::{
         dbmodel::DbModel,
         helpers::ColumnValue,
         primarykey::{
@@ -30,9 +30,6 @@ pub struct Artist {
 impl DbModel for Artist {
     const TABLE: &'static str = "DecibelDb.Artists";
     const ALIAS: &'static str = "artist";
-    const COLUMNS: &'static [str] = &[
-        "Id", "Name", "Bio", "Active", "CreatedDate", "LastEditDate",
-    ];
     fn from_row(row: &Row) -> Result<Self, Error> {
         let id = row.value("Id")?;
         let name = row.value("Name")?;
@@ -56,15 +53,15 @@ impl UniqueName for Artist {
     }
 }
 impl Artist {
-    pub fn insert_new<'a>(c: &mut Connection, name: &'a str, bio: &'a str, active: bool) -> Result<Self, Error> {
-        const INSERT_NEW_SQL: &'static str = include_str!("./sql/insert_new.sql");
-        let new_id;
-        {
-            let mut tx = c.transaction()?;
-            let sp = tx.savepoint()?;
-            let mut stmt = sp.prepare(INSERT_NEW_SQL)?;
-            new_id = stmt.insert(named_params!{ ":name": name, ":bio": bio, ":active": active })?;
-        }
-        return Self::get_by_id(c, new_id);
-    }
+    //pub fn insert_new<'a>(c: &mut Connection, name: &'a str, bio: &'a str, active: bool) -> Result<Self, Error> {
+    //    const INSERT_NEW_SQL: &'static str = include_str!("./sql/insert_new.sql");
+    //    let new_id;
+    //    {
+    //        let mut tx = c.transaction()?;
+    //        let sp = tx.savepoint()?;
+    //        let mut stmt = sp.prepare(INSERT_NEW_SQL)?;
+    //        new_id = stmt.insert(named_params!{ ":name": name, ":bio": bio, ":active": active })?;
+    //    }
+    //    return Self::get_by_id(c, new_id);
+    //}
 }
