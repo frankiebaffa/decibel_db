@@ -8,6 +8,9 @@ path = "./src/bin/migrate_up.rs"
 [[bin]]
 name = "migrate_down"
 path = "./src/bin/migrate_down.rs"
+[[bin]]
+name = "derive_test"
+path = "./src/bin/derive_test.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

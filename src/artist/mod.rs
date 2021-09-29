@@ -18,13 +18,28 @@ use {
         Row,
         named_params,
     },
+    worm_derive::Worm,
 };
+pub trait DbModel2 {
+    const DB: &'static str;
+    const TABLE: &'static str;
+    const ALIAS: &'static str;
+    fn from_row2();
+}
+#[derive(Worm)]
+#[dbmodel(table(db="DecibelDb", name="Artists", alias="artist"))]
 pub struct Artist {
+    #[dbcolumn(column(name="Id"))]
     id: i64,
+    #[dbcolumn(column(name="Name"))]
     name: String,
+    #[dbcolumn(column(name="Bio"))]
     bio: String,
+    #[dbcolumn(column(name="Active"))]
     active: bool,
+    #[dbcolumn(column(name="CreatedDate"))]
     createddate: DateTime<Local>,
+    #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
 }
 impl DbModel for Artist {
@@ -53,6 +68,9 @@ impl UniqueName for Artist {
     }
 }
 impl Artist {
+    pub fn row<'a>() {
+        return Artist::from_row2();
+    }
     //pub fn insert_new<'a>(c: &mut Connection, name: &'a str, bio: &'a str, active: bool) -> Result<Self, Error> {
     //    const INSERT_NEW_SQL: &'static str = include_str!("./sql/insert_new.sql");
     //    let new_id;
