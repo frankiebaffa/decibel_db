@@ -15,4 +15,4 @@ chrono = "0.4"
 dotenv = "0.15"
 migaton = { path = "./migaton" }
 rusqlite = { version = "0.25", features = [ "bundled", "chrono" ] }
-
+worm = { path = "./worm" }

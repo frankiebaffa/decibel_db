@@ -1,4 +1,3 @@
-pub mod traits;
 use crate::context::Context;
 use rusqlite::Connection;
 pub struct Db {}
