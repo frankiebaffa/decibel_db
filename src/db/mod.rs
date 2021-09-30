@@ -1,5 +1,11 @@
 use crate::context::Context;
 use rusqlite::Connection;
+use worm_derive::WormDb;
+use worm::DbContext;
+#[derive(WormDb)]
+pub struct Database {
+    pub context: DbContext,
+}
 pub struct Db {}
 impl Db {
     pub fn attach_temp_db<'db>(connection: &'db mut Connection, context: &Context) -> Result<&'db mut Connection, rusqlite::Error> {
