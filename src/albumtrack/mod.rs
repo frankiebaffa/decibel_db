@@ -1,26 +1,27 @@
 use {
-    chrono::{
-        DateTime,
-        Local,
-    },
+    chrono::{DateTime, Local},
     crate::{
-        artist::Artist,
         album::Album,
-        artisttype::ArtistType,
+        song::Song,
+        file::File,
     },
     worm_derive::Worm,
 };
 #[derive(Worm)]
-#[dbmodel(table(db="DecibelDb",name="AlbumArtists",alias="albumartist"))]
-pub struct AlbumArtist {
+#[dbmodel(table(db="DecibelDb", name="AlbumTracks", alias="albumtrack"))]
+pub struct AlbumTrack {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,
-    #[dbcolumn(column(name="Artist_Id", foreign_key="Artist"))]
-    artist_id: i64,
     #[dbcolumn(column(name="Album_Id", foreign_key="Album"))]
     album_id: i64,
-    #[dbcolumn(column(name="ArtistType_Id", foreign_key="ArtistType"))]
-    artisttype_id: i64,
+    #[dbcolumn(column(name="Song_Id", foreign_key="Song"))]
+    song_id: i64,
+    #[dbcolumn(column(name="File_Id", foreign_key="File"))]
+    file_id: i64,
+    #[dbcolumn(column(name="TrackNumber"))]
+    tracknumber: i8,
+    #[dbcolumn(column(name="Version"))]
+    version: String,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
     #[dbcolumn(column(name="CreatedDate"))]
@@ -28,4 +29,3 @@ pub struct AlbumArtist {
     #[dbcolumn(column(name="LastEditDate"))]
     lasteditdate: DateTime<Local>,
 }
-
