@@ -1,24 +1,13 @@
 use migaton::Migrator;
-use decibel_db::{constants, db::Db, context::Context};
+use decibel_db::db::Database;
 fn main() {
-    match dotenv::dotenv() {
-        Ok(_) => {},
-        Err(_) => {},
-    };
-    let db_path = match std::env::var(constants::DECIBEL_DB_PATH_KEY) {
-        Ok(db_path) => db_path,
-        Err(e) => panic!("{}", e),
-    };
-    let mig_path = match std::env::var(constants::DECIBEL_MIGRATION_PATH_KEY) {
-        Ok(mig_path) => mig_path,
-        Err(e) => panic!("{}", e),
-    };
-    let ctx = Context::init().unwrap();
-    let mut mem_c = rusqlite::Connection::open(":memory:").unwrap();
-    Db::attach_temp_db(&mut mem_c, &ctx).unwrap();
-    let mut c = rusqlite::Connection::open(":memory:").unwrap();
-    Db::attach_db(&mut c, &ctx).unwrap();
-    let skips = match Migrator::do_down(&mut mem_c, &mut c, &mig_path) {
+    let mut mem_db = Database::init();
+    mem_db.context.attach_temp_dbs();
+    let mut db = Database::init();
+    db.context.attach_dbs();
+    let mut mem_c = mem_db.context.use_connection();
+    let mut c = db.context.use_connection();
+    let skips = match Migrator::do_down(&mut mem_c, &mut c, "./migrations") {
         Ok(res) => res,
         Err(e) => panic!("{}", e),
     };
