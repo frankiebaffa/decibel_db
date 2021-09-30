@@ -1,6 +1,6 @@
 [submodule "migaton"]
 	path = migaton
-	url = github:frankiebaffa/migaton
+	url = https://github.com/frankiebaffa/migaton
 	branch = master
 [submodule "worm"]
 	path = worm
