@@ -4,6 +4,7 @@ use {
         Local,
     },
     worm::traits::{
+        activeflag::ActiveFlag,
         dbmodel::DbModel,
         primarykey::PrimaryKey,
         uniquename::UniqueName,
@@ -11,7 +12,7 @@ use {
     worm_derive::Worm,
 };
 #[derive(Worm)]
-#[dbmodel(table(db="DecibelDb", name="Artists", alias="artist", bool_flag="Active"))]
+#[dbmodel(table(db="DecibelDb", name="Artists", alias="artist"))]
 pub struct Artist {
     #[dbcolumn(column(name="Id"))]
     id: i64,
@@ -19,7 +20,7 @@ pub struct Artist {
     name: String,
     #[dbcolumn(column(name="Bio"))]
     bio: String,
-    #[dbcolumn(column(name="Active"))]
+    #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
     #[dbcolumn(column(name="CreatedDate"))]
     createddate: DateTime<Local>,
@@ -39,8 +40,9 @@ impl UniqueName for Artist {
     }
 }
 impl Artist {
-    pub fn row<'a>(row: &rusqlite::Row) -> Result<Artist, rusqlite::Error> {
-        return Artist::from_row(row);
+    pub fn row<'a>(row: &rusqlite::Row) {
+        let artist = Artist::from_row(row).unwrap();
+        artist.get_active();
     }
     //pub fn insert_new<'a>(c: &mut Connection, name: &'a str, bio: &'a str, active: bool) -> Result<Self, Error> {
     //    const INSERT_NEW_SQL: &'static str = include_str!("./sql/insert_new.sql");
