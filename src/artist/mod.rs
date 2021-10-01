@@ -12,9 +12,9 @@ use {
 pub struct Artist {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,
-    #[dbcolumn(column(name="Name", unique_name))]
+    #[dbcolumn(column(name="Name", unique_name, insertable))]
     name: String,
-    #[dbcolumn(column(name="Bio"))]
+    #[dbcolumn(column(name="Bio", insertable))]
     bio: String,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
