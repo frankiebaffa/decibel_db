@@ -11,8 +11,13 @@ path = "./src/bin/migrate_up.rs"
 name = "migrate_down"
 path = "./src/bin/migrate_down.rs"
 
+[[bin]]
+name = "artist_add"
+path = "./src/bin/artist_add.rs"
+
 [dependencies]
 chrono = "0.4"
+clap = { version = "3.0.0-beta.4", features = ["color"] }
 dotenv = "0.15"
 migaton = { path = "./migaton" }
 rusqlite = { version = "0.25", features = [ "bundled", "chrono" ] }

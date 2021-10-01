@@ -15,7 +15,7 @@ pub struct Artist {
     #[dbcolumn(column(name="Name", unique_name, insertable))]
     name: String,
     #[dbcolumn(column(name="Bio", insertable))]
-    bio: String,
+    bio: Option<String>,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
     #[dbcolumn(column(name="CreatedDate"))]
