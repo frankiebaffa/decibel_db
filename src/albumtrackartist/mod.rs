@@ -9,7 +9,7 @@ use {
 };
 #[derive(Worm)]
 #[dbmodel(table(db="DecibelDb", name="AlbumTrackArtists", alias="albumtrackartist"))]
-struct AlbumTrackArtist {
+pub struct AlbumTrackArtist {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,
     #[dbcolumn(column(name="Artist_Id", foreign_key="Artist"))]
