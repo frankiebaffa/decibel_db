@@ -7,11 +7,15 @@ use {
         artist::Artist,
         album::Album,
         artisttype::ArtistType,
+        db::{
+            Database,
+            AttachedToDatabase,
+        },
     },
     worm_derive::Worm,
 };
 #[derive(Worm)]
-#[dbmodel(table(db="DecibelDb",name="AlbumArtists",alias="albumartist"))]
+#[dbmodel(table(db="Database",schema="DecibelDb",name="AlbumArtists",alias="albumartist"))]
 pub struct AlbumArtist {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,

@@ -5,4 +5,3 @@ use worm::DbContext;
 pub struct Database {
     pub context: DbContext,
 }
-

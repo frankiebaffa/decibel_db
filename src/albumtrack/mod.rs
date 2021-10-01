@@ -2,13 +2,17 @@ use {
     chrono::{DateTime, Local},
     crate::{
         album::Album,
+        db::{
+            AttachedToDatabase,
+            Database,
+        },
         song::Song,
         file::File,
     },
     worm_derive::Worm,
 };
 #[derive(Worm)]
-#[dbmodel(table(db="DecibelDb", name="AlbumTracks", alias="albumtrack"))]
+#[dbmodel(table(db="Database",schema="DecibelDb", name="AlbumTracks", alias="albumtrack"))]
 pub struct AlbumTrack {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,

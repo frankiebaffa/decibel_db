@@ -3,10 +3,14 @@ use {
         DateTime,
         Local,
     },
+    crate::db::{
+        Database,
+        AttachedToDatabase,
+    },
     worm_derive::Worm,
 };
 #[derive(Worm)]
-#[dbmodel(table(db="DecibelDb",name="Songs",alias="song"))]
+#[dbmodel(table(db="Database",schema="DecibelDb",name="Songs",alias="song"))]
 pub struct Song {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,
