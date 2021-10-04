@@ -6,6 +6,7 @@ ordering: [
   idx_artisttypesname,
   tbl_albumtypes,
   idx_albumtypesname,
+  ins_albumtypes,
   tbl_albums,
   tbl_albumartists,
   idx_albumartistsunique,

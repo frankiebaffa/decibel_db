@@ -12,8 +12,8 @@ name = "migrate_down"
 path = "./src/bin/migrate_down.rs"
 
 [[bin]]
-name = "artist_add"
-path = "./src/bin/artist_add.rs"
+name = "insert_new"
+path = "./src/bin/insert_new.rs"
 
 [dependencies]
 chrono = "0.4"

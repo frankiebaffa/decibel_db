@@ -10,7 +10,7 @@ use {
     worm_derive::Worm,
 };
 #[derive(Worm)]
-#[dbmodel(table(db="Database",schema="DecibelDb",name="Albums",alias="Album"))]
+#[dbmodel(table(db="Database",schema="DecibelDb",name="AlbumTypes",alias="albumtype"))]
 pub struct AlbumType {
     #[dbcolumn(column(name="Id", primary_key))]
     id: i64,

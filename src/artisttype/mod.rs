@@ -16,7 +16,7 @@ pub struct ArtistType {
     #[dbcolumn(column(name="Descriptor"))]
     descriptor: String,
     #[dbcolumn(column(name="Description"))]
-    description: String,
+    description: Option<String>,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
     #[dbcolumn(column(name="CreatedDate"))]
