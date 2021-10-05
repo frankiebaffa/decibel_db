@@ -9,18 +9,24 @@ use {
         albumtype::AlbumType,
         artisttype::ArtistType,
         albumartist::AlbumArtist,
-        db::Database,
     },
     rusqlite::Error,
     worm::{
         DbCtx,
+        DbContext,
         traits::{
             primarykey::PrimaryKey,
             uniquename::UniqueName,
             uniquename::UniqueNameModel,
         },
     },
+    worm_derive::WormDb,
 };
+#[derive(WormDb)]
+#[db(var(name="DECIBELDBS"))]
+struct Database {
+    context: DbContext,
+}
 #[derive(Clap)]
 #[clap(version = "0.0.1", author = "Frankie B")]
 #[clap(setting = AppSettings::ColoredHelp)]

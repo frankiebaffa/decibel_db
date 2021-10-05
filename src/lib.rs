@@ -7,7 +7,6 @@ pub mod artist;
 pub mod artisttype;
 pub mod constants;
 pub mod context;
-pub mod db;
 pub mod file;
 pub mod song;
 

@@ -1,6 +1,11 @@
 use migaton::Migrator;
-use decibel_db::db::Database;
-use worm::DbCtx;
+use worm_derive::WormDb;
+use worm::{DbCtx, DbContext};
+#[derive(WormDb)]
+#[db(var(name="DECIBELDBS"))]
+struct Database {
+    context: DbContext,
+}
 fn main() {
     let mut mem_db = Database::init();
     mem_db.context.attach_temp_dbs();
