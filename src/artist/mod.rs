@@ -4,7 +4,6 @@ use {
         Local,
     },
     worm_derive::Worm,
-    worm::DbCtx,
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="Artists",alias="artist"))]
