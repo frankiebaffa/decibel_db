@@ -17,7 +17,7 @@ path = "./src/bin/insert_new.rs"
 
 [dependencies]
 chrono = "0.4"
-clap = { version = "3.0.0-beta.4", features = ["color"] }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
 dotenv = "0.15"
 migaton = { git = "https://github.com/frankiebaffa/migaton", branch = "master" }
 rusqlite = { version = "0.25", features = [ "bundled", "chrono" ] }
