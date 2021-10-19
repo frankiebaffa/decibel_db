@@ -1,6 +1,7 @@
-use decibel_db::Migrations;
+use decibel_db::DecibelMigrator;
 use worm_derive::WormDb;
 use worm::{DbCtx, DbContext};
+use migaton::traits::DoMigrations;
 #[derive(WormDb)]
 #[db(var(name="DECIBELDBS"))]
 struct Database {
@@ -11,6 +12,6 @@ fn main() {
     mem_db.context.attach_temp_dbs();
     let mut db = Database::init();
     db.context.attach_dbs();
-    let skips = Migrations::migrate_up(&mut mem_db, &mut db);
+    let skips = DecibelMigrator::migrate_up(&mut mem_db, &mut db);
     println!("{} migrations were skipped", skips);
 }

@@ -1,4 +1,5 @@
-use decibel_db::Migrations;
+use decibel_db::DecibelMigrator;
+use migaton::traits::DoMigrations;
 use worm_derive::WormDb;
 use worm::{DbCtx, DbContext};
 #[derive(WormDb)]
@@ -11,6 +12,6 @@ fn main() {
     mem_db.context.attach_temp_dbs();
     let mut db = Database::init();
     db.context.attach_dbs();
-    let skips = Migrations::migrate_down(&mut mem_db, &mut db);
+    let skips = DecibelMigrator::migrate_down(&mut mem_db, &mut db);
     println!("{} migrations were skipped", skips);
 }

@@ -1,8 +1,5 @@
 use {
-    clap::{
-        AppSettings,
-        Clap
-    },
+    clap::Parser,
     decibel_db::{
         artist::Artist,
         album::Album,
@@ -27,33 +24,29 @@ use {
 struct Database {
     context: DbContext,
 }
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(version = "0.0.1", author = "Frankie B")]
-#[clap(setting = AppSettings::ColoredHelp)]
 struct Opts {
     #[clap(subcommand)]
     which_model: WhichModel,
 }
-#[derive(Clap)]
+#[derive(Parser)]
 enum WhichModel {
     #[clap(version = "0.0.1", author = "Frankie B")]
-    #[clap(setting = AppSettings::ColoredHelp)]
     Artist(ArtistOpts),
     #[clap(version = "0.0.1", author = "Frankie B")]
-    #[clap(setting = AppSettings::ColoredHelp)]
     Album(AlbumOpts),
     #[clap(version = "0.0.1", author = "Frankie B")]
-    #[clap(setting = AppSettings::ColoredHelp)]
     AlbumArtist(AlbumArtistOpts),
 }
-#[derive(Clap)]
+#[derive(Parser)]
 struct ArtistOpts {
     #[clap(long)]
     name: String,
     #[clap(long)]
     bio: Option<String>,
 }
-#[derive(Clap)]
+#[derive(Parser)]
 struct AlbumOpts {
     #[clap(long)]
     album_type: String,
@@ -62,7 +55,7 @@ struct AlbumOpts {
     #[clap(long)]
     blurb: Option<String>,
 }
-#[derive(Clap)]
+#[derive(Parser)]
 struct AlbumArtistOpts {
     #[clap(long)]
     artist_name: String,
@@ -72,7 +65,7 @@ struct AlbumArtistOpts {
     artist_type_name: String,
 }
 fn main() -> Result<(), Error> {
-    let clap: Opts = Clap::parse();
+    let clap: Opts = Parser::parse();
     let mut db = Database::init();
     db.context.attach_dbs();
     let mode = clap.which_model;
