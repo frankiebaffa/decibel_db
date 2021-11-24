@@ -20,6 +20,4 @@ chrono = "0.4"
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 dotenv = "0.15"
 migaton = { git = "https://github.com/frankiebaffa/migaton", branch = "master" }
-rusqlite = { version = "0.25", features = [ "bundled", "chrono" ] }
-worm_derive = { git = "https://github.com/frankiebaffa/worm_derive", branch = "master" }
-worm = { git = "https://github.com/frankiebaffa/worm", branch = "master" }
+worm = { git = "https://github.com/frankiebaffa/worm", branch = "master", features = ["derive"] }
