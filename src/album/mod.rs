@@ -4,7 +4,7 @@ use {
         Local,
     },
     crate::albumtype::AlbumType,
-    worm_derive::Worm,
+    worm::derive::Worm,
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="Albums",alias="album"))]

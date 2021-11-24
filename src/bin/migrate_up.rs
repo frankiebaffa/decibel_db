@@ -1,6 +1,6 @@
 use decibel_db::DecibelMigrator;
-use worm_derive::WormDb;
-use worm::{DbCtx, DbContext};
+use worm::derive::WormDb;
+use worm::core::{DbCtx, DbContext};
 use migaton::traits::DoMigrations;
 #[derive(WormDb)]
 #[db(var(name="DECIBELDBS"))]

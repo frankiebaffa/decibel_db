@@ -3,7 +3,7 @@ use {
         DateTime,
         Local
     },
-    worm_derive::Worm,
+    worm::derive::Worm,
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="AlbumTypes",alias="albumtype"))]

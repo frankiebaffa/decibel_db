@@ -8,7 +8,7 @@ use {
         album::Album,
         artisttype::ArtistType,
     },
-    worm_derive::Worm,
+    worm::derive::Worm,
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="AlbumArtists",alias="albumartist"))]

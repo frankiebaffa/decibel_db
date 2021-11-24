@@ -5,7 +5,7 @@ use {
         song::Song,
         file::File,
     },
-    worm_derive::Worm,
+    worm::derive::Worm,
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb", name="AlbumTracks", alias="albumtrack"))]

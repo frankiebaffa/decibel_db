@@ -1,7 +1,7 @@
 use decibel_db::DecibelMigrator;
 use migaton::traits::DoMigrations;
-use worm_derive::WormDb;
-use worm::{DbCtx, DbContext};
+use worm::derive::WormDb;
+use worm::core::{DbCtx, DbContext};
 #[derive(WormDb)]
 #[db(var(name="DECIBELDBS"))]
 struct Database {

@@ -1,6 +1,6 @@
 use {
     chrono::{DateTime, Local},
-    worm_derive::Worm,
+    worm::derive::Worm,
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="ArtistTypes",alias="artisttypes"))]

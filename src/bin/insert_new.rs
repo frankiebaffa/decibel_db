@@ -7,17 +7,15 @@ use {
         artisttype::ArtistType,
         albumartist::AlbumArtist,
     },
-    rusqlite::Error,
-    worm::{
+    worm::core::{
         DbCtx,
         DbContext,
-        traits::{
-            primarykey::PrimaryKey,
-            uniquename::UniqueName,
-            uniquename::UniqueNameModel,
-        },
+        PrimaryKey,
+        sql::Error,
+        UniqueName,
+        UniqueNameModel,
     },
-    worm_derive::WormDb,
+    worm::derive::WormDb,
 };
 #[derive(WormDb)]
 #[db(var(name="DECIBELDBS"))]
