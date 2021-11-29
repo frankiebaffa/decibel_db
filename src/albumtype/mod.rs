@@ -1,10 +1,4 @@
-use {
-    chrono::{
-        DateTime,
-        Local
-    },
-    worm::derive::Worm,
-};
+use worm::derive::Worm;
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="AlbumTypes",alias="albumtype"))]
 pub struct AlbumType {
@@ -16,8 +10,4 @@ pub struct AlbumType {
     description: String,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
-    #[dbcolumn(column(name="CreatedDate"))]
-    createddate: DateTime<Local>,
-    #[dbcolumn(column(name="LastEditDate"))]
-    lasteditdate: DateTime<Local>,
 }

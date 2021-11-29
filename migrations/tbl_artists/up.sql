@@ -4,6 +4,6 @@ create table DecibelDb.Artists
 	,	Name text not null
 	,	Bio text null
 	,	Active integer not null default 1
-	,	CreatedDate text not null default current_timestamp
-	,	LastEditDate text not null default current_timestamp
+	,	CreatedDate text not null
+	,	LastEditDate text not null
 	);

@@ -4,6 +4,6 @@ create table DecibelDb.Songs
 	,	Name text not null
 	,	Blurb text null
 	,	Active integer not null default 1
-	,	CreatedDate integer not null default 1
-	,	LastEditDate integer not null default 1
+	,	CreatedDate text not null
+	,	LastEditDate text not null
 	);

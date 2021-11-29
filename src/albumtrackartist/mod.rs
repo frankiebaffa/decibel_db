@@ -1,5 +1,5 @@
 use {
-    chrono::{DateTime, Local},
+    chrono::{DateTime, Utc},
     crate::{
         artist::Artist,
         albumtrack::AlbumTrack,
@@ -20,8 +20,8 @@ pub struct AlbumTrackArtist {
     artisttype_id: i64,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
-    #[dbcolumn(column(name="CreatedDate"))]
-    createddate: DateTime<Local>,
-    #[dbcolumn(column(name="LastEditDate"))]
-    lasteditdate: DateTime<Local>,
+    #[dbcolumn(column(name="CreatedDate", insertable, utc_now))]
+    createddate: DateTime<Utc>,
+    #[dbcolumn(column(name="LastEditDate", insertable, utc_now))]
+    lasteditdate: DateTime<Utc>,
 }

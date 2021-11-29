@@ -6,7 +6,7 @@ create table DecibelDb.Albums
 	,	Blurb text null
 	,	Active integer not null default 1
 	,	ReleaseDate text null
-	,	CreatedDate text not null default current_timestamp
-	,	LastEditDate text not null default current_timestamp
+	,	CreatedDate text not null
+	,	LastEditDate text not null
 	,	foreign key (AlbumType_Id) references AlbumTypes(Id)
 	);
