@@ -3,21 +3,9 @@ name = "decibel_db"
 version = "0.1.0"
 edition = "2018"
 
-[[bin]]
-name = "migrate_up"
-path = "./src/bin/migrate_up.rs"
-
-[[bin]]
-name = "migrate_down"
-path = "./src/bin/migrate_down.rs"
-
-[[bin]]
-name = "insert_new"
-path = "./src/bin/insert_new.rs"
-
 [dependencies]
 chrono = "0.4"
-clap = { version = "3.0.0-beta.5", features = ["color"] }
 dotenv = "0.15"
 migaton = { git = "https://github.com/frankiebaffa/migaton", branch = "master" }
+serial_test = "*"
 worm = { git = "https://github.com/frankiebaffa/worm", branch = "master", features = ["derive"] }

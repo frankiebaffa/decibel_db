@@ -9,6 +9,8 @@ pub mod constants;
 pub mod context;
 pub mod file;
 pub mod song;
+#[cfg(test)]
+mod tests;
 use migaton::traits::Migrations;
 pub struct DecibelMigrator;
 impl DecibelMigrator {
