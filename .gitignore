@@ -1,3 +1,4 @@
 /target
 .env
 *.db
+db_designs/music.db.png

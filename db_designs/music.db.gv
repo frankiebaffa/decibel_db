@@ -1,565 +1,137 @@
-graph Music {
-	Artists[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">Artists</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Name</td>
-				<td>text</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Bio</td>
-				<td>text</td>
-				<td>null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="6">create unique index ArtistsNameUnique on Artists (Name) where Active = 1</td>
-			</tr>
+digraph Music {
+	compound=true;
+	node[colorscheme=dark28;shape=rectangle];
+	edge[colorscheme=dark28];
+	label=<<b>DecibelDb</b>>;
+	fontsize=18;
+	labelloc=t;
+	splines=ortho;
+	ranksep=1;
+	nodesep=1;
+	Artists[label=<
+		<table border="0">
+			<tr><td align="left"><b>Artists</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left">Name</td></tr>
+			<tr><td align="left">Bio</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	ArtistTypes[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">ArtistTypes</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Name</td>
-				<td>text</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Description</td>
-				<td>text</td>
-				<td>null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="6">create unique index ArtistTypesNameUnique on ArtistTypes (Name) where Active = 1</td>
-			</tr>
+	>];
+	AlbumTypes[label=<
+		<table border="0">
+			<tr><td align="left"><b>AlbumTypes</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left">Name</td></tr>
+			<tr><td align="left">Description</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	AlbumTypes[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">AlbumTypes</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Name</td>
-				<td>text</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Description</td>
-				<td>text</td>
-				<td>null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="6">create unique index AlbumTypesNameUnique on AlbumTypes (Name) where Active = 1</td>
-			</tr>
+	>];
+	Albums[label=<
+		<table border="0">
+			<tr><td align="left"><b>Albums</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left"><i>AlbumType_Id</i></td></tr>
+			<tr><td align="left">Name</td></tr>
+			<tr><td align="left">Blurb</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	Albums[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">Albums</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>AlbumType_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references AlbumTypes (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Name</td>
-				<td>text</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Blurb</td>
-				<td>text</td>
-				<td>null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
+	>];
+	AlbumTypes->Albums;
+	Songs[label=<
+		<table border="0">
+			<tr><td align="left"><b>Songs</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left">Name</td></tr>
+			<tr><td align="left">Blurb</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	AlbumArtists[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">AlbumArtists</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Artist_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references Artists (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Album_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references Albums (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>ArtistType_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references ArtistTypes (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="6">create unique index AlbumArtistsUnique on AlbumArtists (Artist_Id, Album_Id, ArtistType_Id) where Active = 1</td>
-			</tr>
+	>];
+	Files[label=<
+		<table border="0">
+			<tr><td align="left"><b>Files</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left">FileBlob</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	Songs[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">Songs</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Name</td>
-				<td>text</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Blurb</td>
-				<td>text</td>
-				<td>null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
+	>];
+	{rank=same;Artists;Albums;Songs;Files}
+	ArtistTypes[label=<
+		<table border="0">
+			<tr><td align="left"><b>ArtistTypes</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left">Name</td></tr>
+			<tr><td align="left">Description</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	Files[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">Files</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>FileBlob</td>
-				<td>blob</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
+	>];
+	AlbumArtists[label=<
+		<table border="0">
+			<tr><td align="left"><b>AlbumArtists</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left"><i>Artist_Id</i></td></tr>
+			<tr><td align="left"><i>Album_Id</i></td></tr>
+			<tr><td align="left"><i>ArtistType_Id</i></td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	AlbumTracks[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">AlbumTracks</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Album_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references Albums (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Song_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references Songs (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>File_Id</td>
-				<td>integer</td>
-				<td>null</td>
-				<td></td>
-				<td>foreign key references Files (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>TrackNumber</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Version</td>
-				<td>text</td>
-				<td>null</td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="6">create unique index AlbumTracksUnique on AlbumTracks (Album_Id, Song_Id) where Active = 1</td>
-			</tr>
+	>];
+	{rank=same;ArtistTypes;AlbumArtists;}
+	Artists->AlbumArtists;
+	Albums->AlbumArtists;
+	ArtistTypes->AlbumArtists;
+	AlbumTracks[label=<
+		<table border="0">
+			<tr><td align="left"><b>AlbumTracks</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left"><i>Album_Id</i></td></tr>
+			<tr><td align="left"><i>Song_Id</i></td></tr>
+			<tr><td align="left"><i>File_Id</i></td></tr>
+			<tr><td align="left">TrackNumber</td></tr>
+			<tr><td align="left">Version</td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	AlbumTrackArtists[shape=plain;label=<
-		<table>
-			<tr>
-				<td colspan="6">AlbumTrackArtists</td>
-			</tr>
-			<tr>
-				<td>Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>primary key</td>
-				<td>autoincrement</td>
-			</tr>
-			<tr>
-				<td>Artist_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references Artists (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>AlbumTrack_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references AlbumTracks (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>ArtistType_Id</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td></td>
-				<td>foreign key references ArtistTypes (Id)</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Active</td>
-				<td>integer</td>
-				<td>not null</td>
-				<td>default 1</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>CreatedDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>LastEditDate</td>
-				<td>text</td>
-				<td>not null</td>
-				<td>default current_timestamp</td>
-				<td></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td colspan="6">create unique index AlbumTrackArtistsUnique on AlbumTrackArtists (Artist_Id, AlbumTrack_Id, ArtistType_Id) where Active = 1</td>
-			</tr>
+	>];
+	{rank=same;AlbumArtists;AlbumTracks;}
+	Albums->AlbumTracks;
+	Songs->AlbumTracks;
+	Files->AlbumTracks;
+	AlbumTrackArtists[label=<
+		<table border="0">
+			<tr><td align="left"><b>AlbumTrackArtists</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>Id</b></td></tr>
+			<tr><td align="left"><i>Artist_Id</i></td></tr>
+			<tr><td align="left"><i>AlbumTrack_Id</i></td></tr>
+			<tr><td align="left"><i>ArtistType_Id</i></td></tr>
+			<tr><td align="left">Active</td></tr>
+			<tr><td align="left">CreatedDate</td></tr>
+			<tr><td align="left">LastEditDate</td></tr>
 		</table>
-	>]
-	Artists--AlbumArtists[label=Artist_Id;style=dotted]
-	AlbumArtists--Albums[label=Album_Id;style=dotted]
-	AlbumArtists--ArtistTypes[label=ArtistType_Id;style=dotted]
-	Albums--AlbumTypes[label=AlbumType_Id;style=dotted]
-	Albums--AlbumTracks[label=Album_Id;style=dotted]
-	AlbumTracks--Songs[label=Song_Id;style=dotted]
-	AlbumTracks--Files[label=File_Id;style=dotted]
-	AlbumTracks--AlbumTrackArtists[label=AlbumTrack_Id;style=dotted]
-	AlbumTrackArtists--ArtistTypes[label=ArtistType_Id;style=dotted]
-	AlbumTrackArtists--Artists[label=Artist_Id;style=dotted]
+	>];
+	AlbumTracks->AlbumTrackArtists;
+	Artists->AlbumTrackArtists;
+	ArtistTypes->AlbumTrackArtists;
 }
