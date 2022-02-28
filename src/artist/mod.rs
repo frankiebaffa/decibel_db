@@ -3,7 +3,11 @@ use {
         DateTime,
         Utc,
     },
-    worm::derive::Worm,
+    crate::error::{ DecibelDbErr, DecibelDbError, },
+    worm::{
+        derive::Worm,
+        core::{ DbCtx, UniqueNameModel, },
+    },
 };
 #[derive(Worm)]
 #[dbmodel(table(schema="DecibelDb",name="Artists",alias="artist"))]
@@ -20,4 +24,15 @@ pub struct Artist {
     createddate: DateTime<Utc>,
     #[dbcolumn(column(name="LastEditDate", insertable, utc_now))]
     lasteditdate: DateTime<Utc>,
+}
+impl Artist {
+    pub fn get_existing_or_insert_new(
+        db: &mut impl DbCtx, name: impl AsRef<str>
+    ) -> Result<Self, DecibelDbErr> {
+        match Artist::get_by_name(db, name.as_ref()).quick() {
+            Ok(artist) => return Ok(artist),
+            Err(_) => {},
+        }
+        Artist::insert_new(db, name.as_ref().to_string(), None).quick()
+    }
 }

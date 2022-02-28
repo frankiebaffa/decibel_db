@@ -24,25 +24,22 @@ use {
 struct Database {
     context: DbContext,
 }
-fn get_db_ctx() -> (Database, Database) {
-    let mut mem_db = Database::init();
-    mem_db.context.attach_temp_dbs();
+fn get_db_ctx() -> Database {
     let mut db = Database::init();
     db.context.attach_dbs();
-    return (mem_db, db);
+    db
 }
-fn migrate_up(mem_db: &mut Database, db: &mut Database) {
-    DecibelMigrator::migrate_up(mem_db, db);
+fn migrate_up() {
+    DecibelMigrator::migrate_up::<Database>(None);
 }
-fn migrate_down(mem_db: &mut Database, db: &mut Database) {
-    DecibelMigrator::migrate_down(mem_db, db);
+fn migrate_down() {
+    DecibelMigrator::migrate_down::<Database>(None);
 }
 #[test]
 #[serial]
 fn migrations() {
-    let (mut mem_db, mut db) = get_db_ctx();
-    migrate_up(&mut mem_db, &mut db);
-    migrate_down(&mut mem_db, &mut db);
+    migrate_up();
+    migrate_down();
 }
 const ARTIST_NAME: &'static str = "Test Artist 1";
 const ARTIST_BIO: &'static str = "This is a test artist.";
@@ -57,10 +54,10 @@ fn insert_new_artist(db: &mut Database) -> Artist {
 #[test]
 #[serial]
 fn insert_artist() {
-    let (mut mem_db, mut db) = get_db_ctx();
-    migrate_up(&mut mem_db, &mut db);
+    migrate_up();
+    let mut db = get_db_ctx();
     insert_new_artist(&mut db);
-    migrate_down(&mut mem_db, &mut db);
+    migrate_down();
 }
 const ALBUM_TYPE_NAME: &'static str = "LP";
 fn get_album_type_by_name(db: &mut Database) -> AlbumType {
@@ -73,10 +70,10 @@ fn get_album_type_by_name(db: &mut Database) -> AlbumType {
 #[test]
 #[serial]
 fn get_album_type() {
-    let (mut mem_db, mut db) = get_db_ctx();
-    migrate_up(&mut mem_db, &mut db);
+    migrate_up();
+    let mut db = get_db_ctx();
     get_album_type_by_name(&mut db);
-    migrate_down(&mut mem_db, &mut db);
+    migrate_down();
 }
 const ALBUM_NAME: &'static str = "Test Album 1";
 const ALBUM_BLURB: &'static str = "This is a test album.";
@@ -92,11 +89,11 @@ fn insert_new_album(db: &mut Database, at: &AlbumType) -> Album {
 #[test]
 #[serial]
 fn insert_album() {
-    let (mut mem_db, mut db) = get_db_ctx();
-    migrate_up(&mut mem_db, &mut db);
+    migrate_up();
+    let mut db = get_db_ctx();
     let at = get_album_type_by_name(&mut db);
     insert_new_album(&mut db, &at);
-    migrate_down(&mut mem_db, &mut db);
+    migrate_down();
 }
 const ARTIST_TYPE_NAME: &'static str = "Performer";
 fn get_artist_type_by_name(db: &mut Database) -> ArtistType {
@@ -109,10 +106,10 @@ fn get_artist_type_by_name(db: &mut Database) -> ArtistType {
 #[test]
 #[serial]
 fn get_artist_type() {
-    let (mut mem_db, mut db) = get_db_ctx();
-    migrate_up(&mut mem_db, &mut db);
+    migrate_up();
+    let mut db = get_db_ctx();
     get_artist_type_by_name(&mut db);
-    migrate_down(&mut mem_db, &mut db);
+    migrate_down();
 }
 fn insert_new_album_artist(
     db: &mut Database, ar: &Artist, al: &Album, at: &ArtistType
@@ -137,12 +134,12 @@ fn insert_new_album_artist(
 #[test]
 #[serial]
 fn insert_album_artist() {
-    let (mut mem_db, mut db) = get_db_ctx();
-    migrate_up(&mut mem_db, &mut db);
+    migrate_up();
+    let mut db = get_db_ctx();
     let ar = insert_new_artist(&mut db);
     let at = get_album_type_by_name(&mut db);
     let al = insert_new_album(&mut db, &at);
     let art = get_artist_type_by_name(&mut db);
     insert_new_album_artist(&mut db, &ar, &al, &art);
-    migrate_down(&mut mem_db, &mut db);
+    migrate_down();
 }

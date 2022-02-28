@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+buildlite = { git = "https://github.com/frankiebaffa/buildlite", branch = "master" }
 chrono = "0.4"
 dotenv = "0.15"
 migaton = { git = "https://github.com/frankiebaffa/migaton", branch = "master" }

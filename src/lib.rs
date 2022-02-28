@@ -7,6 +7,7 @@ pub mod artist;
 pub mod artisttype;
 pub mod constants;
 pub mod context;
+pub mod error;
 pub mod file;
 pub mod song;
 #[cfg(test)]

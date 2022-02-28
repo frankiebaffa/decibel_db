@@ -3,7 +3,6 @@ use std::env;
 pub struct Context {
     db_path: String,
     db_name: String,
-    migration_path: String,
 }
 impl Context {
     pub fn init() -> Result<Context, env::VarError> {
@@ -15,14 +14,9 @@ impl Context {
             Ok(db_path) => db_path,
             Err(e) => return Err(e),
         };
-        let migration_path = match env::var(constants::DECIBEL_MIGRATION_PATH_KEY) {
-            Ok(migration_path) => migration_path,
-            Err(e) => return Err(e),
-        };
         return Ok(Context {
             db_path,
             db_name: String::from(constants::DECIBEL_DB_NAME),
-            migration_path,
         });
     }
     pub fn get_path_to_db(&self) -> String {
@@ -37,8 +31,5 @@ impl Context {
     }
     pub fn get_db_name(&self) -> &str {
         return &self.db_name;
-    }
-    pub fn get_migration_path(&self) -> &str {
-        return &self.migration_path;
     }
 }
