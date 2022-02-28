@@ -12,6 +12,8 @@ pub struct File {
     id: i64,
     #[dbcolumn(column(name="FileBlob"))]
     fileblob: Vec<u8>,
+    #[dbcolumn(column(name="MimeType"))]
+    mime_type: String,
     #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
     #[dbcolumn(column(name="CreatedDate", insertable, utc_now))]

@@ -3,7 +3,10 @@ use {
         DateTime,
         Utc,
     },
-    crate::albumtype::AlbumType,
+    crate::{
+        albumtype::AlbumType,
+        file::File,
+    },
     worm::derive::Worm,
 };
 #[derive(Worm)]
@@ -13,6 +16,8 @@ pub struct Album {
     id: i64,
     #[dbcolumn(column(name="AlbumType_Id", foreign_key="AlbumType", insertable))]
     albumtype_id: i64,
+    #[dbcolumn(column(name="Cover_Id", foreign_key="File", insertable))]
+    cover_id: i64,
     #[dbcolumn(column(name="Name", insertable))]
     name: String,
     #[dbcolumn(column(name="Blurb", insertable))]
