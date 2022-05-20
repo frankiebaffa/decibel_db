@@ -1,12 +1,13 @@
 [package]
 name = "decibel_db"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
+[dependencies.async-std]
+features = ["attributes"]
+version = "1.11.0"
+[dependencies.chrono]
+version = "0.4"
+[dependencies.sqlx]
+features = ["runtime-async-std-native-tls", "sqlite"]
+version = "0.5.13"
 
-[dependencies]
-buildlite = { git = "https://github.com/frankiebaffa/buildlite", branch = "master" }
-chrono = "0.4"
-dotenv = "0.15"
-migaton = { git = "https://github.com/frankiebaffa/migaton", branch = "master" }
-serial_test = "*"
-worm = { git = "https://github.com/frankiebaffa/worm", branch = "master", features = ["derive"] }

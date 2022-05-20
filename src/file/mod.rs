@@ -3,21 +3,14 @@ use {
         DateTime,
         Utc,
     },
-    worm::derive::Worm,
+    sqlx::FromRow,
 };
-#[derive(Worm)]
-#[dbmodel(table(schema="DecibelDb",name="Files",alias="file"))]
+#[derive(FromRow)]
 pub struct File {
-    #[dbcolumn(column(name="Id", primary_key))]
     id: i64,
-    #[dbcolumn(column(name="FileBlob"))]
-    fileblob: Vec<u8>,
-    #[dbcolumn(column(name="MimeType"))]
+    file_blob: Vec<u8>,
     mime_type: String,
-    #[dbcolumn(column(name="Active", active_flag))]
     active: bool,
-    #[dbcolumn(column(name="CreatedDate", insertable, utc_now))]
-    createddate: DateTime<Utc>,
-    #[dbcolumn(column(name="LastEditDate", insertable, utc_now))]
-    lasteditdate: DateTime<Utc>,
+    created_date: DateTime<Utc>,
+    last_edit_date: DateTime<Utc>,
 }
