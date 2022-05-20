@@ -2,3 +2,5 @@
 .env
 *.db
 db_designs/music.db.png
+test_dbs/
+Cargo.lock
