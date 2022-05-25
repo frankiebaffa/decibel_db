@@ -8,6 +8,9 @@ version = "1.11.0"
 [dependencies.chrono]
 version = "0.4"
 [dependencies.sqlx]
-features = ["runtime-async-std-native-tls", "sqlite"]
+features = ["runtime-async-std-native-tls", "sqlite", "chrono"]
 version = "0.5.13"
+[dependencies.uuid]
+features = ["v4"]
+version = "1.1.0"
 
