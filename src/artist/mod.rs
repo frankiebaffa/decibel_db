@@ -6,7 +6,7 @@ use {
     sqlx::{
         FromRow,
         SqlitePool,
-        Error as SqlxError,
+        Result as SqlxResult,
         query,
         query_as,
     },
@@ -21,7 +21,7 @@ pub struct Artist {
     last_edit_date: DateTime<Utc>,
 }
 impl Artist {
-    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Artist, SqlxError> {
+    pub async fn lookup(db: &SqlitePool, id: i64) -> SqlxResult<Self> {
         query_as::<_, Self>("
             select
                 id,
@@ -37,7 +37,7 @@ impl Artist {
             .fetch_one(db)
             .await
     }
-    pub async fn insert(db: &SqlitePool, name: String) -> Result<Artist, SqlxError> {
+    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> SqlxResult<Self> {
         let now = Utc::now();
         let active = true;
         let id = query("
