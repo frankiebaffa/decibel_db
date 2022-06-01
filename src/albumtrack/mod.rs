@@ -53,6 +53,24 @@ impl AlbumTrack {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
+    pub async fn from_album(db: &SqlitePool, album: &Album) -> Result<Vec<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                album_id,
+                song_id,
+                file_id,
+                track_number,
+                version,
+                active,
+                created_date,
+                last_edit_date
+            from albumtracks
+            where album_id = $1
+        ").bind(album.get_id())
+            .fetch_all(db)
+            .await
+    }
     pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select

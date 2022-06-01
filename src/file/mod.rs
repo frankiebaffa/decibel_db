@@ -3,6 +3,7 @@ use {
         DateTime,
         Utc,
     },
+    crate::albumtrack::AlbumTrack,
     sqlx::{
         FromRow,
         query,
@@ -38,6 +39,70 @@ impl File {
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
+    }
+    pub async fn from_albumtracks(
+        db: &SqlitePool, albumtracks: &Vec<AlbumTrack>
+    ) -> Result<Vec<Self>> {
+        // begin trn
+        let mut trn = db.begin().await?;
+        match query("
+            create table temp.tmpfileids (
+                id integer not null primary key
+            )
+        ").execute(&mut trn).await {
+            Ok(_) => {},
+            Err(e) => {
+                trn.rollback().await?;
+                return Err(e);
+            },
+        }
+        for at in albumtracks.iter() {
+            match query("
+                insert into temp.tmpfileids (
+                    id
+                ) values (
+                    $1
+                )
+            ").bind(at.get_file_id())
+                .execute(&mut trn)
+                .await
+            {
+                Ok(_) => {},
+                Err(e) => {
+                    trn.rollback().await?;
+                    return Err(e);
+                },
+            }
+        }
+        let tracks = match query_as::<_, Self>("
+            select
+                file.id,
+                file.file_blob,
+                file.mime_type,
+                file.active,
+                file.created_date,
+                file.last_edit_date
+            from files as file
+            join temp.tmpfileids as tmp
+            on file.id = tmp.id
+        ").fetch_all(&mut trn).await {
+            Ok(t) => t,
+            Err(e) => {
+                trn.rollback().await?;
+                return Err(e);
+            },
+        };
+        match query("
+            drop table temp.tmpfileids
+        ").execute(&mut trn).await {
+            Ok(_) => {},
+            Err(e) => {
+                trn.rollback().await?;
+                return Err(e);
+            },
+        }
+        trn.commit().await?;
+        Ok(tracks)
     }
     pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
