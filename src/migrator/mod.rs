@@ -58,7 +58,9 @@ impl DecibelMigrator {
                         name text not null,
                         descriptor text not null,
                         description text null,
-                        active integer not null default 1
+                        active integer not null default 1,
+                        created_date text not null,
+                        last_edit_date text not null
                     );
             ").execute(db).await?;
         }
@@ -129,7 +131,9 @@ impl DecibelMigrator {
                     id integer not null primary key autoincrement,
                     name text not null,
                     description text null,
-                    active integer not null default 1
+                    active integer not null default 1,
+                    created_date text not null,
+                    last_edit_date text not null
                 );
             ").execute(db).await?;
         }
@@ -393,11 +397,11 @@ impl DecibelMigrator {
         Self::tbl_albumtypes(db).await?;
         Self::idx_albumtypesname(db).await?;
         Self::ins_albumtypes(db).await?;
+        Self::tbl_files(db).await?;
         Self::tbl_albums(db).await?;
         Self::tbl_albumartists(db).await?;
         Self::idx_albumartistsunique(db).await?;
         Self::tbl_songs(db).await?;
-        Self::tbl_files(db).await?;
         Self::tbl_albumtracks(db).await?;
         Self::idx_albumtracksunique(db).await?;
         Self::tbl_albumtrackartists(db).await?;

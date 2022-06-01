@@ -1,9 +1,15 @@
-use sqlx::{
-    FromRow,
-    Result,
-    SqlitePool,
-    query,
-    query_as,
+use {
+    chrono::{
+        DateTime,
+        Utc,
+    },
+    sqlx::{
+        FromRow,
+        Result,
+        SqlitePool,
+        query,
+        query_as,
+    },
 };
 #[derive(FromRow)]
 pub struct AlbumType {
@@ -11,6 +17,8 @@ pub struct AlbumType {
     name: String,
     description: Option<String>,
     active: bool,
+    created_date: DateTime<Utc>,
+    last_edit_date: DateTime<Utc>,
 }
 impl AlbumType {
     pub fn get_id(&self) -> i64 {
@@ -24,6 +32,12 @@ impl AlbumType {
     }
     pub fn get_active(&self) -> bool {
         self.active
+    }
+    pub fn get_created_date(&self) -> DateTime<Utc> {
+        self.created_date
+    }
+    pub fn get_last_edit_date(&self) -> DateTime<Utc> {
+        self.last_edit_date
     }
     fn name_query() -> String {
         String::from(
@@ -71,16 +85,20 @@ impl AlbumType {
         &mut self, db: &SqlitePool, desc: &'a str
     ) -> Result<()> {
         if !self.get_description().eq(&Some(desc.to_string())) {
+            let now = Utc::now();
             query("
                 update albumtypes
                 set
-                    description = $1
+                    description = $1,
+                    last_edit_date = $2
                 where id = $2
             ").bind(desc)
+                .bind(now)
                 .bind(self.get_id())
                 .execute(db)
                 .await?;
             self.description = Some(desc.to_string());
+            self.last_edit_date = now;
         }
         Ok(())
     }
