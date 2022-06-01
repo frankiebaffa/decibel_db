@@ -200,9 +200,9 @@ impl DecibelMigrator {
                     blurb text null,
                     active integer not null default 1,
                     cover_id integer null,
-                    releasedate text null,
-                    createddate text not null,
-                    lasteditdate text not null,
+                    release_date text null,
+                    created_date text not null,
+                    last_edit_date text not null,
                     foreign key (albumtype_id) references albumtypes(id),
                     foreign key (cover_id) references files (id)
                 );
@@ -225,8 +225,8 @@ impl DecibelMigrator {
                     album_id integer not null,
                     artisttype_id integer not null,
                     active integer not null default 1,
-                    createddate text not null,
-                    lasteditdate text not null,
+                    created_date text not null,
+                    last_edit_date text not null,
                     foreign key (artist_id) references artists (id),
                     foreign key (album_id) references albums (id),
                     foreign key (artisttype_id) references artisttypes (id)
@@ -267,8 +267,8 @@ impl DecibelMigrator {
                     name text not null,
                     blurb text null,
                     active integer not null default 1,
-                    createddate text not null,
-                    lasteditdate text not null
+                    created_date text not null,
+                    last_edit_date text not null
                 );
             ").execute(db).await?;
         }
@@ -280,16 +280,16 @@ impl DecibelMigrator {
             from sqlite_master
             where type = 'table'
             and name = 'files';
-        ").fetch_one(db).await? .0 > 0;
+        ").fetch_one(db).await?.0 > 0;
         if !chk {
             query("
                 create table files (
                     id integer not null primary key autoincrement,
-                    fileblob blob not null,
-                    mimetype text not null,
+                    file_blob blob not null,
+                    mime_type text not null,
                     active integer not null default 1,
-                    createddate text not null,
-                    lasteditdate text not null
+                    created_date text not null,
+                    last_edit_date text not null
                 );
             ").execute(db).await?;
         }
@@ -309,11 +309,11 @@ impl DecibelMigrator {
                     album_id integer not null,
                     song_id integer not null,
                     file_id integer null,
-                    tracknumber integer not null,
+                    track_number integer not null,
                     version text null,
                     active integer not null default 1,
-                    createddate text not null,
-                    lasteditdate text not null,
+                    created_date text not null,
+                    last_edit_date text not null,
                     foreign key (album_id) references albums (id),
                     foreign key (song_id) references songs (id),
                     foreign key (file_id) references files (id)
@@ -356,8 +356,8 @@ impl DecibelMigrator {
                     albumtrack_id integer not null,
                     artisttype_id integer not null,
                     active integer not null default 1,
-                    createddate text not null,
-                    lasteditdate text not null,
+                    created_date text not null,
+                    last_edit_date text not null,
                     foreign key (artist_id) references artists (id),
                     foreign key (albumtrack_id) references albumtracks (id),
                     foreign key (artisttype_id) references artisttypes (id)
