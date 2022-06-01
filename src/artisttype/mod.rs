@@ -42,12 +42,12 @@ impl ArtistType {
             limit 1"
         )
     }
-    async fn get_by_name<'a>(db: &SqlitePool, type_name: &'a str) -> SqlxResult<Self> {
+    pub async fn lookup<'a>(db: &SqlitePool, type_name: &'a str) -> SqlxResult<Self> {
         query_as::<_, Self>(&Self::name_query()).bind(type_name)
             .fetch_one(db)
             .await
     }
-    async fn get_optional_by_name<'a>(db: &SqlitePool, type_name: &'a str) -> SqlxResult<Option<Self>> {
+    pub async fn optional<'a>(db: &SqlitePool, type_name: &'a str) -> SqlxResult<Option<Self>> {
         query_as::<_, Self>(&Self::name_query()).bind(type_name)
             .fetch_optional(db)
             .await
@@ -65,15 +65,12 @@ impl ArtistType {
             .bind(desc)
             .execute(db)
             .await?;
-        Self::get_by_name(db, type_name).await
+        Self::lookup(db, type_name).await
     }
-    pub async fn lookup<'a>(db: &SqlitePool, type_name: &'a str, desc: Option<&'a str>) -> SqlxResult<Self> {
-        match desc {
-            Some(d) => match Self::get_optional_by_name(db, type_name).await? {
-                Some(a) => Ok(a),
-                None => Self::insert(db, type_name, d).await,
-            },
-            None => Self::get_by_name(db, type_name).await,
+    pub async fn always<'a>(db: &SqlitePool, type_name: &'a str, desc: &'a str) -> SqlxResult<Self> {
+        match Self::optional(db, type_name).await? {
+            Some(a) => Ok(a),
+            None => Self::insert(db, type_name, desc).await,
         }
     }
 }

@@ -79,21 +79,22 @@ impl Song {
     pub async fn set_blurb<'a>(
         &mut self, db: &SqlitePool, blurb: &'a str
     ) -> Result<()> {
-        let now = Utc::now();
-        query("
-            update songs
-            set
-                blurb = $1,
-                last_edit_date = $2
-            where id = $3
-        ").bind(blurb)
-            .bind(now)
-            .bind(self.get_id())
-            .execute(db)
-            .await?;
-        let new_song = Self::lookup(db, self.get_id()).await?;
-        self.blurb = new_song.blurb;
-        self.last_edit_date = new_song.last_edit_date;
+        if !self.get_blurb().eq(&Some(blurb.to_string())) {
+            let now = Utc::now();
+            query("
+                update songs
+                set
+                    blurb = $1,
+                    last_edit_date = $2
+                where id = $3
+            ").bind(blurb)
+                .bind(now)
+                .bind(self.get_id())
+                .execute(db)
+                .await?;
+            self.blurb = Some(blurb.to_string());
+            self.last_edit_date = now;
+        }
         Ok(())
     }
 }

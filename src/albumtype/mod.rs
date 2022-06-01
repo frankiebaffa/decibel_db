@@ -9,7 +9,7 @@ use sqlx::{
 pub struct AlbumType {
     id: i64,
     name: String,
-    description: String,
+    description: Option<String>,
     active: bool,
 }
 impl AlbumType {
@@ -19,7 +19,7 @@ impl AlbumType {
     pub fn get_name(&self) -> String {
         self.name.clone()
     }
-    pub fn get_description(&self) -> String {
+    pub fn get_description(&self) -> Option<String> {
         self.description.clone()
     }
     pub fn get_active(&self) -> bool {
@@ -37,40 +37,51 @@ impl AlbumType {
             limit 1
         ")
     }
-    async fn get_by_name<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
+    pub async fn lookup<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
         query_as::<_, Self>(&Self::name_query())
             .bind(name)
             .fetch_one(db)
             .await
     }
-    async fn get_by_name_opt<'a>(db: &SqlitePool, name: &'a str) -> Result<Option<Self>> {
+    pub async fn optional<'a>(db: &SqlitePool, name: &'a str) -> Result<Option<Self>> {
         query_as::<_, Self>(&Self::name_query())
             .bind(name)
             .fetch_optional(db)
             .await
     }
-    pub async fn insert<'a>(db: &SqlitePool, name: &'a str, description: &'a str) -> Result<Self> {
+    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
         query("
             insert into albumtypes (
-                name,
-                description
+                name
             ) values (
-                $1,
-                $2
+                $1
             )
         ").bind(name)
-            .bind(description)
             .execute(db)
             .await?;
-        Self::get_by_name(db, name).await
+        Self::lookup(db, name).await
     }
-    pub async fn lookup<'a>(db: &SqlitePool, name: &'a str, desc: Option<&'a str>) -> Result<Self> {
-        match desc {
-            Some(d) => match Self::get_by_name_opt(db, name).await? {
-                Some(a) => Ok(a),
-                None => Self::insert(db, name, d).await,
-            },
-            None => Self::get_by_name(db, name).await,
+    pub async fn always<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
+        match Self::optional(db, name).await? {
+            Some(a) => Ok(a),
+            None => Self::insert(db, name).await,
         }
+    }
+    pub async fn set_description<'a>(
+        &mut self, db: &SqlitePool, desc: &'a str
+    ) -> Result<()> {
+        if !self.get_description().eq(&Some(desc.to_string())) {
+            query("
+                update albumtypes
+                set
+                    description = $1
+                where id = $2
+            ").bind(desc)
+                .bind(self.get_id())
+                .execute(db)
+                .await?;
+            self.description = Some(desc.to_string());
+        }
+        Ok(())
     }
 }

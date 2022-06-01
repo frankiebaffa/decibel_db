@@ -4,6 +4,7 @@ use {
         albumtype::AlbumType,
         albumartist::AlbumArtist,
         albumtrack::AlbumTrack,
+        albumtrackartist::AlbumTrackArtist,
         artist::Artist,
         artisttype::ArtistType,
         file::File,
@@ -87,7 +88,7 @@ async fn dup_ins_artist() {
 }
 async fn do_insert_artist_type(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let artist_type = ArtistType::lookup(&db, "Composer", Some("Composed By")).await
+    let artist_type = ArtistType::always(&db, "Composer", "Composed By").await
         .unwrap();
     assert_eq!(artist_type.get_name(), "Composer");
 }
@@ -108,17 +109,27 @@ async fn dup_artist_type() {
 }
 async fn do_ins_album_type(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let ins_1 = AlbumType::lookup(&db, "SomeAlbumType", Some("Some album type")).await;
+    let ins_1 = AlbumType::always(&db, "SomeAlbumType").await;
     assert!(ins_1.is_ok());
 }
 #[async_std::test]
 async fn ins_album_type() {
     db_test(do_ins_album_type).await;
 }
+async fn do_set_albumtype_desc(db: SqlitePool) {
+    DecibelMigrator::migrate(&db).await.unwrap();
+    let mut ins_1 = AlbumType::always(&db, "SomeAlbumType").await.unwrap();
+    ins_1.set_description(&db, "A full release").await.unwrap();
+    assert_eq!(ins_1.get_description(), Some("A full release".to_string()));
+}
+#[async_std::test]
+async fn set_albumtype_desc() {
+    db_test(do_set_albumtype_desc).await;
+}
 async fn do_dup_album_type_lookup(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let dup_1 = AlbumType::lookup(&db, "SomeAlbumType", Some("Some album type")).await;
-    let dup_2 = AlbumType::lookup(&db, "SomeAlbumType", Some("Some album type")).await;
+    let dup_1 = AlbumType::always(&db, "SomeAlbumType").await;
+    let dup_2 = AlbumType::always(&db, "SomeAlbumType").await;
     assert!(dup_1.is_ok());
     assert!(dup_2.is_ok());
 }
@@ -128,8 +139,8 @@ async fn dup_album_type_lkup() {
 }
 async fn do_dup_album_type_insert(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let dup_1 = AlbumType::lookup(&db, "SomeAlbumType", Some("Some album type")).await;
-    let dup_2 = AlbumType::insert(&db, "SomeAlbumType", "Some album type").await;
+    let dup_1 = AlbumType::always(&db, "SomeAlbumType").await;
+    let dup_2 = AlbumType::insert(&db, "SomeAlbumType").await;
     assert!(dup_1.is_ok());
     assert!(dup_2.is_err());
 }
@@ -169,7 +180,7 @@ async fn ins_file() {
 }
 async fn do_ins_album(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let albumtype = AlbumType::lookup(&db, "SomeAlbumType", Some("Some album type")).await.unwrap();
+    let albumtype = AlbumType::always(&db, "SomeAlbumType").await.unwrap();
     let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
     assert_eq!(album.get_name(), "Album One");
     assert_eq!(album.get_albumtype_id(), albumtype.get_id());
@@ -183,7 +194,7 @@ async fn do_set_album_cover(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
     let blob = include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/src/lib.rs"));
     let file = File::insert(&db, blob, "text/plain").await.unwrap();
-    let albumtype = AlbumType::lookup(&db, "SomeAlbumType", Some("Some album type")).await.unwrap();
+    let albumtype = AlbumType::always(&db, "SomeAlbumType").await.unwrap();
     let mut album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
     assert_eq!(album.get_name(), "Album One");
     assert_eq!(album.get_albumtype_id(), albumtype.get_id());
@@ -197,11 +208,11 @@ async fn set_album_cover() {
 async fn do_ins_albumartist(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
     let artist = Artist::insert(&db, "Artist One").await.unwrap();
-    let albumtype = AlbumType::lookup(&db, "LP", Some("A full album release"))
+    let albumtype = AlbumType::always(&db, "LP")
         .await
         .unwrap();
     let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
-    let artisttype = ArtistType::lookup(&db, "Writer", Some("The primary writer of the album"))
+    let artisttype = ArtistType::always(&db, "Writer", "Written By")
         .await
         .unwrap();
     let albumartist = AlbumArtist::insert(&db, &artist, &album, &artisttype)
@@ -217,7 +228,7 @@ async fn ins_albumartist() {
 }
 async fn do_ins_albumtrack(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let albumtype = AlbumType::lookup(&db, "LP", None).await.unwrap();
+    let albumtype = AlbumType::always(&db, "LP").await.unwrap();
     let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
     let song = Song::insert(&db, "Song One").await.unwrap();
     let albumtrack = AlbumTrack::insert(&db, &album, &song, 1).await.unwrap();
@@ -230,7 +241,7 @@ async fn ins_albumtrack() {
 }
 async fn do_set_albumtrack_version(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let albumtype = AlbumType::lookup(&db, "LP", None).await.unwrap();
+    let albumtype = AlbumType::always(&db, "LP").await.unwrap();
     let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
     let song = Song::insert(&db, "Song One").await.unwrap();
     let mut albumtrack = AlbumTrack::insert(&db, &album, &song, 1).await.unwrap();
@@ -244,7 +255,7 @@ async fn set_albumtrack_version() {
 }
 async fn do_set_albumtrack_file(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let albumtype = AlbumType::lookup(&db, "LP", None).await.unwrap();
+    let albumtype = AlbumType::always(&db, "LP").await.unwrap();
     let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
     let song = Song::insert(&db, "Song One").await.unwrap();
     let file_b = include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/src/lib.rs"));
@@ -257,4 +268,23 @@ async fn do_set_albumtrack_file(db: SqlitePool) {
 #[async_std::test]
 async fn set_albumtrack_file() {
     db_test(do_set_albumtrack_file).await;
+}
+async fn do_ins_albumtrackartist(db: SqlitePool) {
+    DecibelMigrator::migrate(&db).await.unwrap();
+    let artist = Artist::insert(&db, "Artist One").await.unwrap();
+    let albumtype = AlbumType::always(&db, "LP").await.unwrap();
+    let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
+    let song = Song::insert(&db, "Song One").await.unwrap();
+    let albumtrack = AlbumTrack::insert(&db, &album, &song, 1).await.unwrap();
+    let artisttype = ArtistType::always(&db, "Writer", "Written By").await.unwrap();
+    let albumtrackartist = AlbumTrackArtist::insert(
+        &db, &artist, &albumtrack, &artisttype
+    ).await.unwrap();
+    assert_eq!(albumtrackartist.get_artist_id(), artist.get_id());
+    assert_eq!(albumtrackartist.get_albumtrack_id(), albumtrack.get_id());
+    assert_eq!(albumtrackartist.get_artisttype_id(), artisttype.get_id());
+}
+#[async_std::test]
+async fn ins_albumtrackartist() {
+    db_test(do_ins_albumtrackartist).await;
 }

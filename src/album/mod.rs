@@ -101,21 +101,22 @@ impl Album {
     pub async fn set_cover(
         &mut self, db: &SqlitePool, cover: &File
     ) -> Result<()> {
-        let now = Utc::now();
-        query("
-            update albums
-            set
-                cover_id = $1,
-                last_edit_date = $2
-            where id = $3
-        ").bind(cover.get_id())
-            .bind(now)
-            .bind(self.get_id())
-            .execute(db)
-            .await?;
-        let new_album = Self::lookup(db, self.get_id()).await?;
-        self.cover_id = new_album.get_cover_id();
-        self.last_edit_date = new_album.get_last_edit_date();
+        if !self.get_cover_id().eq(&Some(cover.get_id())) {
+            let now = Utc::now();
+            query("
+                update albums
+                set
+                    cover_id = $1,
+                    last_edit_date = $2
+                where id = $3
+            ").bind(cover.get_id())
+                .bind(now)
+                .bind(self.get_id())
+                .execute(db)
+                .await?;
+            self.cover_id = Some(cover.get_id());
+            self.last_edit_date = now;
+        }
         Ok(())
     }
 }
