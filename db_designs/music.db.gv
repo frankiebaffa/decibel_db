@@ -8,130 +8,134 @@ digraph Music {
 	splines=ortho;
 	ranksep=1;
 	nodesep=1;
+	rankdir=TB;
 	Artists[label=<
 		<table border="0">
-			<tr><td align="left"><b>Artists</b></td></tr>
+			<tr><td align="left"><b>artists</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left">Name</td></tr>
-			<tr><td align="left">Bio</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left">name</td></tr>
+			<tr><td align="left">bio</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
+		</table>
+	>];
+	ArtistTypes[label=<
+		<table border="0">
+			<tr><td align="left"><b>artisttypes</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left">name</td></tr>
+			<tr><td align="left">descriptor</td></tr>
+			<tr><td align="left">description</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
 	AlbumTypes[label=<
 		<table border="0">
-			<tr><td align="left"><b>AlbumTypes</b></td></tr>
+			<tr><td align="left"><b>albumtypes</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left">Name</td></tr>
-			<tr><td align="left">Description</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
-		</table>
-	>];
-	Albums[label=<
-		<table border="0">
-			<tr><td align="left"><b>Albums</b></td></tr>
-			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left"><i>AlbumType_Id</i></td></tr>
-			<tr><td align="left">Name</td></tr>
-			<tr><td align="left">Blurb</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
-		</table>
-	>];
-	AlbumTypes->Albums;
-	Songs[label=<
-		<table border="0">
-			<tr><td align="left"><b>Songs</b></td></tr>
-			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left">Name</td></tr>
-			<tr><td align="left">Blurb</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left">name</td></tr>
+			<tr><td align="left">description</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
 	Files[label=<
 		<table border="0">
-			<tr><td align="left"><b>Files</b></td></tr>
+			<tr><td align="left"><b>files</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left">FileBlob</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left">file_blob</td></tr>
+			<tr><td align="left">mime_type</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
-	{rank=same;Artists;Albums;Songs;Files}
-	ArtistTypes[label=<
+	Songs[label=<
 		<table border="0">
-			<tr><td align="left"><b>ArtistTypes</b></td></tr>
+			<tr><td align="left"><b>songs</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left">Name</td></tr>
-			<tr><td align="left">Description</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left">name</td></tr>
+			<tr><td align="left">blurb</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
+	{rank=same;Artists;ArtistTypes;AlbumTypes;Files;Songs;}
+	Albums[label=<
+		<table border="0">
+			<tr><td align="left"><b>albums</b></td></tr>
+			<hr />
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left"><i>albumtype_id</i></td></tr>
+			<tr><td align="left"><i>cover_id</i></td></tr>
+			<tr><td align="left">name</td></tr>
+			<tr><td align="left">blurb</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">related_date</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
+		</table>
+	>];
+	AlbumTypes->Albums;
+	Files->Albums;
 	AlbumArtists[label=<
 		<table border="0">
-			<tr><td align="left"><b>AlbumArtists</b></td></tr>
+			<tr><td align="left"><b>albumartists</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left"><i>Artist_Id</i></td></tr>
-			<tr><td align="left"><i>Album_Id</i></td></tr>
-			<tr><td align="left"><i>ArtistType_Id</i></td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left"><i>artist_id</i></td></tr>
+			<tr><td align="left"><i>album_id</i></td></tr>
+			<tr><td align="left"><i>artisttype_id</i></td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
-	{rank=same;ArtistTypes;AlbumArtists;}
 	Artists->AlbumArtists;
 	Albums->AlbumArtists;
 	ArtistTypes->AlbumArtists;
 	AlbumTracks[label=<
 		<table border="0">
-			<tr><td align="left"><b>AlbumTracks</b></td></tr>
+			<tr><td align="left"><b>albumtracks</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left"><i>Album_Id</i></td></tr>
-			<tr><td align="left"><i>Song_Id</i></td></tr>
-			<tr><td align="left"><i>File_Id</i></td></tr>
-			<tr><td align="left">TrackNumber</td></tr>
-			<tr><td align="left">Version</td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left"><i>album_id</i></td></tr>
+			<tr><td align="left"><i>song_id</i></td></tr>
+			<tr><td align="left"><i>file_id</i></td></tr>
+			<tr><td align="left">track_number</td></tr>
+			<tr><td align="left">version</td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
-	{rank=same;AlbumArtists;AlbumTracks;}
 	Albums->AlbumTracks;
 	Songs->AlbumTracks;
 	Files->AlbumTracks;
 	AlbumTrackArtists[label=<
 		<table border="0">
-			<tr><td align="left"><b>AlbumTrackArtists</b></td></tr>
+			<tr><td align="left"><b>albumtrackartists</b></td></tr>
 			<hr />
-			<tr><td align="left"><b>Id</b></td></tr>
-			<tr><td align="left"><i>Artist_Id</i></td></tr>
-			<tr><td align="left"><i>AlbumTrack_Id</i></td></tr>
-			<tr><td align="left"><i>ArtistType_Id</i></td></tr>
-			<tr><td align="left">Active</td></tr>
-			<tr><td align="left">CreatedDate</td></tr>
-			<tr><td align="left">LastEditDate</td></tr>
+			<tr><td align="left"><b>id</b></td></tr>
+			<tr><td align="left"><i>artist_id</i></td></tr>
+			<tr><td align="left"><i>albumtrack_id</i></td></tr>
+			<tr><td align="left"><i>artisttype_id</i></td></tr>
+			<tr><td align="left">active</td></tr>
+			<tr><td align="left">created_date</td></tr>
+			<tr><td align="left">last_edit_date</td></tr>
 		</table>
 	>];
-	AlbumTracks->AlbumTrackArtists;
 	Artists->AlbumTrackArtists;
+	AlbumTracks->AlbumTrackArtists;
 	ArtistTypes->AlbumTrackArtists;
 }
