@@ -66,42 +66,6 @@ impl DecibelMigrator {
         }
         Ok(())
     }
-    async fn ins_artisttypes(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(*)
-            from artisttypes
-            limit 1;
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                insert into artisttypes
-                    (
-                        name,
-                        descriptor
-                    )
-                select
-                    'Performer',
-                    'Performed by'
-                union all
-                select
-                    'Writer',
-                    'Written by'
-                union all
-                select
-                    'Composer',
-                    'Composed by'
-                union all
-                select
-                    'Producer',
-                    'Produced by'
-                union all
-                select
-                    'Feature',
-                    'Featuring';
-            ").execute(db).await?;
-        }
-        Ok(())
-    }
     async fn idx_artisttypesname(db: &SqlitePool) -> Result<(), SqlxError> {
         let chk = query_as::<_, (i64,)>("
             select count(name)
@@ -151,39 +115,6 @@ impl DecibelMigrator {
                 create unique index albumtypesnameunique
                 on albumtypes (name)
                 where active = 1;
-            ").execute(db).await?;
-        }
-        Ok(())
-    }
-    async fn ins_albumtypes(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(Name)
-            from albumtypes;
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                insert into albumtypes (
-                    name,
-                    description
-                )
-                select
-                    'LP',
-                    'A long play'
-                union all
-                select
-                    'EP',
-                    'An extended play'
-                union all
-                select
-                    'Single',
-                    'A single release';
-                select
-                    'Mixtape',
-                    'An unofficial release'
-                union all
-                select
-                    'Compilation',
-                    'A release with varying track artists';
             ").execute(db).await?;
         }
         Ok(())
@@ -392,11 +323,9 @@ impl DecibelMigrator {
         Self::tbl_artists(db).await?;
         Self::idx_artistsname(db).await?;
         Self::tbl_artisttypes(db).await?;
-        Self::ins_artisttypes(db).await?;
         Self::idx_artisttypesname(db).await?;
         Self::tbl_albumtypes(db).await?;
         Self::idx_albumtypesname(db).await?;
-        Self::ins_albumtypes(db).await?;
         Self::tbl_files(db).await?;
         Self::tbl_albums(db).await?;
         Self::tbl_albumartists(db).await?;

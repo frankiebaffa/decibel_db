@@ -45,7 +45,9 @@ impl AlbumType {
                 id,
                 name,
                 description,
-                active
+                active,
+                created_date,
+                last_edit_date
             from albumtypes
             where name = $1
             limit 1
@@ -64,13 +66,19 @@ impl AlbumType {
             .await
     }
     pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
+        let now = Utc::now();
         query("
             insert into albumtypes (
-                name
+                name,
+                created_date,
+                last_edit_date
             ) values (
-                $1
+                $1,
+                $2,
+                $2
             )
         ").bind(name)
+            .bind(now)
             .execute(db)
             .await?;
         Self::lookup(db, name).await
