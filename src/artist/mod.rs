@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod tests;
 use {
     chrono::{
         DateTime,
@@ -6,7 +8,7 @@ use {
     sqlx::{
         FromRow,
         SqlitePool,
-        Result as SqlxResult,
+        Result,
         query,
         query_as,
     },
@@ -21,7 +23,35 @@ pub struct Artist {
     last_edit_date: DateTime<Utc>,
 }
 impl Artist {
-    pub async fn lookup(db: &SqlitePool, id: i64) -> SqlxResult<Self> {
+    pub async fn get_all_active(db: &SqlitePool) -> Result<Vec<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                name,
+                bio,
+                active,
+                created_date,
+                last_edit_date
+            from artists
+            where active = 1
+        ").fetch_all(db)
+            .await
+    }
+    pub async fn get_all_inactive(db: &SqlitePool) -> Result<Vec<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                name,
+                bio,
+                active,
+                created_date,
+                last_edit_date
+            from artists
+            where active = 0
+        ").fetch_all(db)
+            .await
+    }
+    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select
                 id,
@@ -37,7 +67,7 @@ impl Artist {
             .fetch_one(db)
             .await
     }
-    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> SqlxResult<Self> {
+    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
         let now = Utc::now();
         let active = true;
         let id = query("
@@ -77,5 +107,25 @@ impl Artist {
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
+    }
+    pub async fn deactivate(&mut self, db: &SqlitePool) -> Result<()> {
+        if !self.active {
+            return Ok(());
+        }
+        let now = Utc::now();
+        query("
+            update artists
+            set
+                active = $1,
+                last_edit_date = $2
+            where id = $3
+        ").bind(0)
+            .bind(now)
+            .bind(self.get_id())
+            .execute(db)
+            .await?;
+        self.active = false;
+        self.last_edit_date = now;
+        Ok(())
     }
 }

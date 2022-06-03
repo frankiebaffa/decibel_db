@@ -10,3 +10,5 @@ pub mod song;
 pub mod migrator;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod test_utils;

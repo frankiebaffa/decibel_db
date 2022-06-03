@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod tests;
 use {
     chrono::{DateTime, Utc},
     crate::{
