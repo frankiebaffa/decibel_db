@@ -9,7 +9,8 @@ use {
 fn get_file_name() -> String {
     let uuid = Uuid::new_v4();
     let name = format!(
-        "./test_dbs/rusters_{}.db",
+        "{}/test_dbs/decibel_{}.db",
+        env!("CARGO_MANIFEST_DIR"),
         uuid.as_hyphenated()
     );
     name
