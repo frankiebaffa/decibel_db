@@ -28,46 +28,27 @@ async fn do_dup_ins_artist(db: SqlitePool) {
 async fn dup_ins_artist() {
     db_test(do_dup_ins_artist).await;
 }
-async fn do_get_all_active_artists(db: SqlitePool) {
+async fn do_get_all_artists(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
     Artist::insert(&db, "Artist One").await.unwrap();
     Artist::insert(&db, "Artist Two").await.unwrap();
     Artist::insert(&db, "Artist Three").await.unwrap();
-    let artists = Artist::get_all_active(&db).await.unwrap();
+    let artists = Artist::get_all(&db).await.unwrap();
     assert_eq!(artists.len(), 3);
 }
 #[async_std::test]
-async fn get_all_active_artists() {
-    db_test(do_get_all_active_artists).await;
+async fn get_all_artists() {
+    db_test(do_get_all_artists).await;
 }
-async fn do_deactivate_artist(db: SqlitePool) {
+async fn do_delete_artist(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let mut artist = Artist::insert(&db, "Artist One").await.unwrap();
-    artist.deactivate(&db).await.unwrap();
-    assert_eq!(artist.get_active(), false);
+    let artist = Artist::insert(&db, "Artist One").await.unwrap();
+    let id = artist.id.clone();
+    artist.delete(&db).await.unwrap();
+    let chk_deleted = Artist::lookup_by_id(&db, id).await;
+    assert!(chk_deleted.is_err());
 }
 #[async_std::test]
-async fn deactivate_artist() {
-    db_test(do_deactivate_artist).await;
-}
-async fn do_get_all_inctive_artists(db: SqlitePool) {
-    DecibelMigrator::migrate(&db).await.unwrap();
-    Artist::insert(&db, "Artist One").await.unwrap()
-        .deactivate(&db)
-        .await
-        .unwrap();
-    Artist::insert(&db, "Artist Two").await.unwrap()
-        .deactivate(&db)
-        .await
-        .unwrap();
-    Artist::insert(&db, "Artist Three").await.unwrap()
-        .deactivate(&db)
-        .await
-        .unwrap();
-    let artists = Artist::get_all_inactive(&db).await.unwrap();
-    assert_eq!(artists.len(), 3);
-}
-#[async_std::test]
-async fn get_all_inactive_artists(db: SqlitePool) {
-    db_test(do_get_all_inctive_artists).await;
+async fn delete_artist() {
+    db_test(do_delete_artist).await;
 }

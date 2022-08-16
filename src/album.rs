@@ -6,6 +6,7 @@ use {
         Utc,
     },
     crate::{
+        albumartist::AlbumArtist,
         albumtype::AlbumType,
         file::File,
     },
@@ -23,7 +24,6 @@ pub struct Album {
     albumtype_id: i64,
     name: String,
     blurb: Option<String>,
-    active: bool,
     cover_id: Option<i64>,
     release_date: Option<DateTime<Utc>>,
     created_date: DateTime<Utc>,
@@ -45,9 +45,6 @@ impl Album {
     pub fn get_blurb(&self) -> Option<String> {
         self.blurb.clone()
     }
-    pub fn get_active(&self) -> bool {
-        self.active
-    }
     pub fn get_release_date(&self) -> Option<DateTime<Utc>> {
         self.release_date
     }
@@ -57,7 +54,7 @@ impl Album {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select
                 id,
@@ -65,20 +62,67 @@ impl Album {
                 cover_id,
                 name,
                 blurb,
-                active,
                 release_date,
                 created_date,
                 last_edit_date
             from albums
-            where id = $1
-            limit 1
+            where id = $1;
         ").bind(id)
             .fetch_one(db)
             .await
     }
+    pub async fn load_from_albumartist_ids(
+        db: &SqlitePool,
+        ids: Vec<i64>,
+    ) -> Result<Vec<Self>> {
+        query("
+            create temp table temp.tmp_album_ids (
+                album_id integer not null primary key
+            );
+        ").execute(db)
+            .await?;
+        let mut ids_iter = ids.iter();
+        while let Some(id) = ids_iter.next() {
+            query("
+                insert into temp.tmp_album_ids (
+                    album_id
+                ) values (
+                    $1
+                );
+            ").bind(&id)
+                .execute(db)
+                .await?;
+        }
+        query_as::<_, Self>("
+            select
+                id,
+                albumtype_id,
+                cover_id,
+                name,
+                blurb,
+                release_date,
+                created_date,
+                last_edit_date
+            from albums as album
+            join temp.tmp_album_ids as tmp
+            on album.id = tmp.album_id;
+        ").fetch_all(db)
+            .await
+    }
+    pub async fn load_from_albumartists(
+        db: &SqlitePool,
+        album_artists: Vec<AlbumArtist>,
+    ) -> Result<Vec<Self>> {
+        Self::load_from_albumartist_ids(
+            db,
+            album_artists.iter()
+                .map(|a| a.get_id())
+                .collect::<Vec<i64>>()
+        ).await
+    }
     pub async fn insert<'a>(
         db: &SqlitePool, album_type: &AlbumType, name: &'a str
-    ) -> Result<Self> {
+    ) -> Result<i64> {
         let now = Utc::now();
         let id = query("
             insert into albums (
@@ -98,7 +142,7 @@ impl Album {
             .execute(db)
             .await?
             .last_insert_rowid();
-        Self::lookup(db, id).await
+        Ok(id)
     }
     pub async fn set_cover(
         &mut self, db: &SqlitePool, cover: &File

@@ -2,321 +2,185 @@ use sqlx::{
     Error as SqlxError,
     SqlitePool,
     query,
-    query_as,
 };
 pub struct DecibelMigrator;
 impl DecibelMigrator {
     async fn tbl_artists(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'artists';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table artists (
-                    id integer not null primary key autoincrement,
-                    name text not null,
-                    bio text null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists artists (
+                id integer not null primary key autoincrement,
+                name text not null,
+                bio text null,
+                created_date text not null,
+                last_edit_date text not null
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn idx_artistsname(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'index'
-            and name = 'artistsnameunique';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create unique index artistsnameunique
-                on artists (name)
-                where active = 1;
-            ").execute(db).await?;
-        }
+        query("
+            create unique index if not exists artistsnameunique
+            on artists (name);
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_artisttypes(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'artisttypes';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table artisttypes
-                    (
-                        id integer not null primary key autoincrement,
-                        name text not null,
-                        descriptor text not null,
-                        description text null,
-                        active integer not null default 1,
-                        created_date text not null,
-                        last_edit_date text not null
-                    );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists artisttypes
+                (
+                    id integer not null primary key autoincrement,
+                    name text not null,
+                    descriptor text not null,
+                    description text null,
+                    created_date text not null,
+                    last_edit_date text not null
+                );
+        ").execute(db).await?;
         Ok(())
     }
     async fn idx_artisttypesname(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'index'
-            and name = 'artisttypesnameunique'
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create unique index artisttypesnameunique
-                on artisttypes (name)
-                where active = 1;
-            ").execute(db).await?;
-        }
+        query("
+            create unique index if not exists artisttypesnameunique
+            on artisttypes (name);
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_albumtypes(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'albumtypes';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table albumtypes (
-                    id integer not null primary key autoincrement,
-                    name text not null,
-                    description text null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists albumtypes (
+                id integer not null primary key autoincrement,
+                name text not null,
+                description text null,
+                created_date text not null,
+                last_edit_date text not null
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn idx_albumtypesname(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'index'
-            and name = 'albumtypesnameunique';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create unique index albumtypesnameunique
-                on albumtypes (name)
-                where active = 1;
-            ").execute(db).await?;
-        }
+        query("
+            create unique index if not exists albumtypesnameunique
+            on albumtypes (name);
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_albums(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'albums';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table albums (
-                    id integer not null primary key autoincrement,
-                    albumtype_id integer not null,
-                    name text not null,
-                    blurb text null,
-                    active integer not null default 1,
-                    cover_id integer null,
-                    release_date text null,
-                    created_date text not null,
-                    last_edit_date text not null,
-                    foreign key (albumtype_id) references albumtypes(id),
-                    foreign key (cover_id) references files (id)
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists albums (
+                id integer not null primary key autoincrement,
+                albumtype_id integer not null,
+                name text not null,
+                blurb text null,
+                cover_id integer null,
+                release_date text null,
+                created_date text not null,
+                last_edit_date text not null,
+                foreign key (albumtype_id) references albumtypes(id),
+                foreign key (cover_id) references files (id)
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_albumartists(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'albumartists';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table albumartists (
-                    id integer not null primary key autoincrement,
-                    artist_id integer not null,
-                    album_id integer not null,
-                    artisttype_id integer not null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null,
-                    foreign key (artist_id) references artists (id),
-                    foreign key (album_id) references albums (id),
-                    foreign key (artisttype_id) references artisttypes (id)
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists albumartists (
+                id integer not null primary key autoincrement,
+                artist_id integer not null,
+                album_id integer not null,
+                artisttype_id integer not null,
+                created_date text not null,
+                last_edit_date text not null,
+                foreign key (artist_id) references artists (id),
+                foreign key (album_id) references albums (id),
+                foreign key (artisttype_id) references artisttypes (id)
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn idx_albumartistsunique(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'index'
-            and name = 'albumartistsunique';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create unique index albumartistsunique
-                on albumartists (
-                    artist_id, album_id, artisttype_id
-                )
-                where active = 1;
-            ").execute(db).await?;
-        }
+        query("
+            create unique index if not exists albumartistsunique
+            on albumartists (
+                artist_id, album_id, artisttype_id
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_songs(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'songs';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table songs (
-                    id integer not null primary key autoincrement,
-                    name text not null,
-                    blurb text null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists songs (
+                id integer not null primary key autoincrement,
+                name text not null,
+                blurb text null,
+                created_date text not null,
+                last_edit_date text not null
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_files(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'files';
-        ").fetch_one(db).await?.0 > 0;
-        if !chk {
-            query("
-                create table files (
-                    id integer not null primary key autoincrement,
-                    file_blob blob not null,
-                    mime_type text not null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists files (
+                id integer not null primary key autoincrement,
+                file_blob blob not null,
+                mime_type text not null,
+                created_date text not null,
+                last_edit_date text not null
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_albumtracks(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'albumtracks';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table albumtracks (
-                    id integer not null primary key autoincrement,
-                    album_id integer not null,
-                    song_id integer not null,
-                    file_id integer null,
-                    track_number integer not null,
-                    version text null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null,
-                    foreign key (album_id) references albums (id),
-                    foreign key (song_id) references songs (id),
-                    foreign key (file_id) references files (id)
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists albumtracks (
+                id integer not null primary key autoincrement,
+                album_id integer not null,
+                song_id integer not null,
+                file_id integer null,
+                track_number integer not null,
+                version text null,
+                created_date text not null,
+                last_edit_date text not null,
+                foreign key (album_id) references albums (id),
+                foreign key (song_id) references songs (id),
+                foreign key (file_id) references files (id)
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn idx_albumtracksunique(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'index'
-            and name = 'albumtracksunique';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create unique index albumtracksunique
-                on albumtracks (
-                    album_id,
-                    song_id
-                )
-                where active = 1;
-            ").execute(db).await?;
-        }
+        query("
+            create unique index if not exists albumtracksunique
+            on albumtracks (
+                album_id,
+                song_id
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn tbl_albumtrackartists(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'table'
-            and name = 'albumtrackartists';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create table albumtrackartists (
-                    id integer not null primary key autoincrement,
-                    artist_id integer not null,
-                    albumtrack_id integer not null,
-                    artisttype_id integer not null,
-                    active integer not null default 1,
-                    created_date text not null,
-                    last_edit_date text not null,
-                    foreign key (artist_id) references artists (id),
-                    foreign key (albumtrack_id) references albumtracks (id),
-                    foreign key (artisttype_id) references artisttypes (id)
-                );
-            ").execute(db).await?;
-        }
+        query("
+            create table if not exists albumtrackartists (
+                id integer not null primary key autoincrement,
+                artist_id integer not null,
+                albumtrack_id integer not null,
+                artisttype_id integer not null,
+                created_date text not null,
+                last_edit_date text not null,
+                foreign key (artist_id) references artists (id),
+                foreign key (albumtrack_id) references albumtracks (id),
+                foreign key (artisttype_id) references artisttypes (id)
+            );
+        ").execute(db).await?;
         Ok(())
     }
     async fn idx_albumtrackartistsunique(db: &SqlitePool) -> Result<(), SqlxError> {
-        let chk = query_as::<_, (i64,)>("
-            select count(name)
-            from sqlite_master
-            where type = 'index'
-            and name = 'albumtrackartistsunique';
-        ").fetch_one(db).await? .0 > 0;
-        if !chk {
-            query("
-                create unique index albumtrackartistsunique
-                on albumtrackartists (
-                    artist_id, albumtrack_id, artisttype_id
-                )
-                where active = 1;
-            ").execute(db).await?;
-        }
+        query("
+            create unique index if not exists albumtrackartistsunique
+            on albumtrackartists (
+                artist_id, albumtrack_id, artisttype_id
+            )
+        ").execute(db).await?;
         Ok(())
     }
     pub async fn migrate(db: &SqlitePool) -> Result<(), SqlxError> {

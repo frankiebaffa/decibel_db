@@ -18,7 +18,6 @@ pub struct Song {
     id: i64,
     name: String,
     blurb: Option<String>,
-    active: bool,
     created_date: DateTime<Utc>,
     last_edit_date: DateTime<Utc>,
 }
@@ -32,22 +31,18 @@ impl Song {
     pub fn get_blurb(&self) -> Option<String> {
         self.blurb.clone()
     }
-    pub fn get_active(&self) -> bool {
-        self.active
-    }
     pub fn get_created_date(&self) -> DateTime<Utc> {
         self.created_date
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select
                 id,
                 name,
                 blurb,
-                active,
                 created_date,
                 last_edit_date
             from songs
@@ -57,9 +52,44 @@ impl Song {
             .fetch_one(db)
             .await
     }
+    pub async fn load_from_ids(
+        db: &SqlitePool,
+        ids: Vec<i64>,
+    ) -> Result<Vec<Self>> {
+        query("
+            create temp table temp.tmp_song_ids (
+                song_id integer not null primary key
+            );
+        ").execute(db)
+            .await?;
+        let mut ids_iter = ids.iter();
+        while let Some(id) = ids_iter.next() {
+            query("
+                insert into temp.tmp_song_ids (
+                    song_id
+                ) values (
+                    $1
+                );
+            ").bind(&id)
+                .execute(db)
+                .await?;
+        }
+        query_as::<_, Self>("
+            select
+                id,
+                name,
+                blurb,
+                created_date,
+                last_edit_date
+            from songs as song
+            join temp.tmp_song_ids as tmp
+            on song.id = tmp.song_id;
+        ").fetch_all(db)
+            .await
+    }
     pub async fn insert<'a>(
         db: &SqlitePool, name: &'a str
-    ) -> Result<Self> {
+    ) -> Result<i64> {
         let now = Utc::now();
         let id = query("
             insert into songs (
@@ -76,9 +106,9 @@ impl Song {
             .execute(db)
             .await?
             .last_insert_rowid();
-        Self::lookup(db, id).await
+        Ok(id)
     }
-    pub async fn set_blurb<'a>(
+    pub async fn update_blurb<'a>(
         &mut self, db: &SqlitePool, blurb: &'a str
     ) -> Result<()> {
         if !self.get_blurb().eq(&Some(blurb.to_string())) {

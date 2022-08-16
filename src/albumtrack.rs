@@ -23,7 +23,6 @@ pub struct AlbumTrack {
     file_id: Option<i64>,
     track_number: i8,
     version: Option<String>,
-    active: bool,
     created_date: DateTime<Utc>,
     last_edit_date: DateTime<Utc>,
 }
@@ -46,16 +45,13 @@ impl AlbumTrack {
     pub fn get_version(&self) -> Option<String> {
         self.version.clone()
     }
-    pub fn get_active(&self) -> bool {
-        self.active
-    }
     pub fn get_created_date(&self) -> DateTime<Utc> {
         self.created_date
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn from_album(db: &SqlitePool, album: &Album) -> Result<Vec<Self>> {
+    pub async fn load_from_album(db: &SqlitePool, album: &Album) -> Result<Vec<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -64,16 +60,15 @@ impl AlbumTrack {
                 file_id,
                 track_number,
                 version,
-                active,
                 created_date,
                 last_edit_date
             from albumtracks
-            where album_id = $1
+            where album_id = $1;
         ").bind(album.get_id())
             .fetch_all(db)
             .await
     }
-    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select
                 id,
@@ -82,19 +77,17 @@ impl AlbumTrack {
                 file_id,
                 track_number,
                 version,
-                active,
                 created_date,
                 last_edit_date
             from albumtracks
-            where id = $1
-            limit 1
+            where id = $1;
         ").bind(id)
             .fetch_one(db)
             .await
     }
     pub async fn insert(
         db: &SqlitePool, album: &Album, song: &Song, track_number: i8
-    ) -> Result<Self> {
+    ) -> Result<i64> {
         let now = Utc::now();
         let id = query("
             insert into albumtracks (
@@ -109,7 +102,7 @@ impl AlbumTrack {
                 $3,
                 $4,
                 $4
-            )
+            );
         ").bind(album.get_id())
             .bind(song.get_id())
             .bind(track_number)
@@ -117,7 +110,7 @@ impl AlbumTrack {
             .execute(db)
             .await?
             .last_insert_rowid();
-        Self::lookup(db, id).await
+        Ok(id)
     }
     pub async fn set_version<'a>(
         &mut self, db: &SqlitePool, version: &'a str

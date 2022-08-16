@@ -24,7 +24,6 @@ pub struct AlbumArtist {
     artist_id: i64,
     album_id: i64,
     artisttype_id: i64,
-    active: bool,
     created_date: DateTime<Utc>,
     last_edit_date: DateTime<Utc>,
 }
@@ -41,35 +40,66 @@ impl AlbumArtist {
     pub fn get_artisttype_id(&self) -> i64 {
         self.artisttype_id
     }
-    pub fn get_active(&self) -> bool {
-        self.active
-    }
     pub fn get_created_date(&self) -> DateTime<Utc> {
         self.created_date
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select
                 id,
                 artist_id,
                 album_id,
                 artisttype_id,
-                active,
                 created_date,
                 last_edit_date
             from albumartists
-            where id = $1
-            limit 1
+            where id = $1;
         ").bind(id)
             .fetch_one(db)
             .await
     }
+    pub async fn load_from_album_id(db: &SqlitePool, id: i64) -> Result<Vec<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                artist_id,
+                album_id,
+                artisttype_id,
+                created_date,
+                last_edit_date
+            from albumartists
+            where album_id = $1;
+        ").bind(id)
+            .fetch_all(db)
+            .await
+    }
+    pub async fn load_from_artist_id(
+        db: &SqlitePool,
+        id: i64,
+    ) -> Result<Vec<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                artist_id,
+                album_id,
+                artisttype_id,
+                created_date,
+                last_edit_date
+            from albumartists
+            where artist_id = $1;
+        ").bind(id)
+            .fetch_all(db)
+            .await
+    }
+    pub async fn load_from_album(db: &SqlitePool, album: Album) -> Result<Vec<Self>> {
+        Self::load_from_album_id(db, album.get_id()).await
+    }
     pub async fn insert(
         db: &SqlitePool, artist: &Artist, album: &Album, artisttype: &ArtistType
-    ) -> Result<Self> {
+    ) -> Result<i64> {
         let now = Utc::now();
         let id = query("
             insert into albumartists (
@@ -92,6 +122,6 @@ impl AlbumArtist {
             .execute(db)
             .await?
             .last_insert_rowid();
-        Self::lookup(db, id).await
+        Ok(id)
     }
 }

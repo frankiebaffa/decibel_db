@@ -18,11 +18,20 @@ pub struct AlbumType {
     id: i64,
     name: String,
     description: Option<String>,
-    active: bool,
     created_date: DateTime<Utc>,
     last_edit_date: DateTime<Utc>,
 }
 impl AlbumType {
+    pub async fn delete(self, db: &SqlitePool) -> Result<()> {
+        query("
+            delete
+            from albumtypes
+            where id = $1
+        ").bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
     pub fn get_id(&self) -> i64 {
         self.id
     }
@@ -31,9 +40,6 @@ impl AlbumType {
     }
     pub fn get_description(&self) -> Option<String> {
         self.description.clone()
-    }
-    pub fn get_active(&self) -> bool {
-        self.active
     }
     pub fn get_created_date(&self) -> DateTime<Utc> {
         self.created_date
@@ -51,11 +57,10 @@ impl AlbumType {
                 created_date,
                 last_edit_date
             from albumtypes
-            where name = $1
-            limit 1
+            where name = $1;
         ")
     }
-    pub async fn lookup<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
+    pub async fn lookup_by_name<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
         query_as::<_, Self>(&Self::name_query())
             .bind(name)
             .fetch_one(db)
@@ -67,9 +72,9 @@ impl AlbumType {
             .fetch_optional(db)
             .await
     }
-    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
+    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<i64> {
         let now = Utc::now();
-        query("
+        let id = query("
             insert into albumtypes (
                 name,
                 created_date,
@@ -78,17 +83,21 @@ impl AlbumType {
                 $1,
                 $2,
                 $2
-            )
+            );
         ").bind(name)
             .bind(now)
             .execute(db)
-            .await?;
-        Self::lookup(db, name).await
+            .await?
+            .last_insert_rowid();
+        Ok(id)
     }
     pub async fn always<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
         match Self::optional(db, name).await? {
             Some(a) => Ok(a),
-            None => Self::insert(db, name).await,
+            None => {
+                Self::insert(db, name).await?;
+                Ok(Self::lookup_by_name(db, name).await?)
+            },
         }
     }
     pub async fn set_description<'a>(
