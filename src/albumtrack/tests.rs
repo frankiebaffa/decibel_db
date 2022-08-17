@@ -36,7 +36,7 @@ async fn do_set_albumtrack_version(db: SqlitePool) {
     let albumtrack_id = AlbumTrack::insert(&db, &album, &song, 1).await.unwrap();
     let mut albumtrack = AlbumTrack::lookup_by_id(&db, albumtrack_id).await
         .unwrap();
-    albumtrack.set_version(&db, "Live Version").await.unwrap();
+    albumtrack.update_version(&db, "Live Version").await.unwrap();
     let version = albumtrack.get_version().unwrap();
     assert_eq!(version, "Live Version");
 }
@@ -52,12 +52,15 @@ async fn do_set_albumtrack_file(db: SqlitePool) {
     let song_id = Song::insert(&db, "Song One").await.unwrap();
     let song = Song::lookup_by_id(&db, song_id).await.unwrap();
     let file_b = include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/src/lib.rs"));
-    let file = File::insert(&db, file_b, "text/plain").await.unwrap();
+    let file_id = File::insert(&db, file_b, "text/plain").await.unwrap();
+    let file = File::lookup_by_id(&db, file_id)
+        .await
+        .unwrap();
     let albumtrack_id = AlbumTrack::insert(&db, &album, &song, 1).await.unwrap();
     let mut albumtrack = AlbumTrack::lookup_by_id(&db, albumtrack_id)
         .await
         .unwrap();
-    albumtrack.set_file(&db, &file).await.unwrap();
+    albumtrack.update_file(&db, &file).await.unwrap();
     let file_id = albumtrack.get_file_id().unwrap();
     assert_eq!(file.get_id(), file_id);
 }

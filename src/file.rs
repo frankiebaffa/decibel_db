@@ -19,7 +19,6 @@ pub struct File {
     id: i64,
     file_blob: Vec<u8>,
     mime_type: String,
-    active: bool,
     created_date: DateTime<Utc>,
     last_edit_date: DateTime<Utc>,
 }
@@ -33,22 +32,19 @@ impl File {
     pub fn get_mime_type(&self) -> String {
         self.mime_type.clone()
     }
-    pub fn get_active(&self) -> bool {
-        self.active
-    }
     pub fn get_created_date(&self) -> DateTime<Utc> {
         self.created_date
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn from_albumtracks(
+    pub async fn load_from_albumtracks(
         db: &SqlitePool, albumtracks: &Vec<AlbumTrack>
     ) -> Result<Vec<Self>> {
         // begin trn
         let mut trn = db.begin().await?;
         match query("
-            create table temp.tmpfileids (
+            create temp table temp.tmpfileids (
                 id integer not null primary key
             )
         ").execute(&mut trn).await {
@@ -58,7 +54,8 @@ impl File {
                 return Err(e);
             },
         }
-        for at in albumtracks.iter() {
+        let mut albumtracks_iter = albumtracks.iter();
+        while let Some(at) = albumtracks_iter.next() {
             match query("
                 insert into temp.tmpfileids (
                     id
@@ -81,7 +78,6 @@ impl File {
                 file.id,
                 file.file_blob,
                 file.mime_type,
-                file.active,
                 file.created_date,
                 file.last_edit_date
             from files as file
@@ -106,13 +102,12 @@ impl File {
         trn.commit().await?;
         Ok(tracks)
     }
-    pub async fn lookup(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
         query_as::<_, Self>("
             select
                 id,
                 file_blob,
                 mime_type,
-                active,
                 created_date,
                 last_edit_date
             from files
@@ -124,7 +119,7 @@ impl File {
     }
     pub async fn insert<'a>(
         db: &SqlitePool, file_blob: &'a [u8], mime_type: &'a str
-    ) -> Result<Self> {
+    ) -> Result<i64> {
         let now = Utc::now();
         let id = query("
             insert into files (
@@ -144,6 +139,6 @@ impl File {
             .execute(db)
             .await?
             .last_insert_rowid();
-        Self::lookup(db, id).await
+        Ok(id)
     }
 }

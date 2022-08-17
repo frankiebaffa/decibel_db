@@ -8,7 +8,10 @@ use {
 };
 async fn do_insert_artist(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let artist = Artist::insert(&db, "Test Artist")
+    let artist_id = Artist::insert(&db, "Test Artist")
+        .await
+        .unwrap();
+    let artist = Artist::lookup_by_id(&db, artist_id)
         .await
         .unwrap();
     assert_eq!(artist.get_name(), "Test Artist".to_string());
@@ -42,7 +45,10 @@ async fn get_all_artists() {
 }
 async fn do_delete_artist(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let artist = Artist::insert(&db, "Artist One").await.unwrap();
+    let artist_id = Artist::insert(&db, "Artist One").await.unwrap();
+    let artist = Artist::lookup_by_id(&db, artist_id)
+        .await
+        .unwrap();
     let id = artist.id.clone();
     artist.delete(&db).await.unwrap();
     let chk_deleted = Artist::lookup_by_id(&db, id).await;

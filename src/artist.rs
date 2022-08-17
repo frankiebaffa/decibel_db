@@ -40,7 +40,6 @@ impl Artist {
                 id,
                 name,
                 bio,
-                active,
                 created_date,
                 last_edit_date
             from artists
@@ -49,28 +48,24 @@ impl Artist {
             .fetch_one(db)
             .await
     }
-    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
+    pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<i64> {
         let now = Utc::now();
-        let active = true;
         let id = query("
             insert into artists (
                 name,
-                active,
                 created_date,
                 last_edit_date
             ) values (
                 $1,
                 $2,
-                $3,
-                $3
+                $2
             );
         ").bind(name)
-            .bind(active)
             .bind(now)
             .execute(db)
             .await?
             .last_insert_rowid();
-        Self::lookup_by_id(db, id).await
+        Ok(id)
     }
     pub fn get_id(&self) -> i64 {
         self.id
@@ -91,9 +86,8 @@ impl Artist {
         query("
             delete
             from artists
-            where id = $3
-        ").bind(0)
-            .bind(self.get_id())
+            where id = $1
+        ").bind(self.id)
             .execute(db)
             .await?;
         Ok(())

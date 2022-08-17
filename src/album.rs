@@ -75,11 +75,13 @@ impl Album {
         db: &SqlitePool,
         ids: Vec<i64>,
     ) -> Result<Vec<Self>> {
+        let mut trn = db.begin()
+            .await?;
         query("
             create temp table temp.tmp_album_ids (
                 album_id integer not null primary key
             );
-        ").execute(db)
+        ").execute(&mut trn)
             .await?;
         let mut ids_iter = ids.iter();
         while let Some(id) = ids_iter.next() {
@@ -90,10 +92,10 @@ impl Album {
                     $1
                 );
             ").bind(&id)
-                .execute(db)
+                .execute(&mut trn)
                 .await?;
         }
-        query_as::<_, Self>("
+        let albums = query_as::<_, Self>("
             select
                 id,
                 albumtype_id,
@@ -106,8 +108,10 @@ impl Album {
             from albums as album
             join temp.tmp_album_ids as tmp
             on album.id = tmp.album_id;
-        ").fetch_all(db)
-            .await
+        ").fetch_all(&mut trn)
+            .await?;
+        trn.commit().await?;
+        Ok(albums)
     }
     pub async fn load_from_albumartists(
         db: &SqlitePool,

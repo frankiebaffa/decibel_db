@@ -56,11 +56,13 @@ impl Song {
         db: &SqlitePool,
         ids: Vec<i64>,
     ) -> Result<Vec<Self>> {
+        let mut trn = db.begin()
+            .await?;
         query("
             create temp table temp.tmp_song_ids (
                 song_id integer not null primary key
             );
-        ").execute(db)
+        ").execute(&mut trn)
             .await?;
         let mut ids_iter = ids.iter();
         while let Some(id) = ids_iter.next() {
@@ -71,10 +73,10 @@ impl Song {
                     $1
                 );
             ").bind(&id)
-                .execute(db)
+                .execute(&mut trn)
                 .await?;
         }
-        query_as::<_, Self>("
+        let songs = query_as::<_, Self>("
             select
                 id,
                 name,
@@ -84,8 +86,10 @@ impl Song {
             from songs as song
             join temp.tmp_song_ids as tmp
             on song.id = tmp.song_id;
-        ").fetch_all(db)
-            .await
+        ").fetch_all(&mut trn)
+            .await?;
+        trn.commit().await?;
+        Ok(songs)
     }
     pub async fn insert<'a>(
         db: &SqlitePool, name: &'a str

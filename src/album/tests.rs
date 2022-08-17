@@ -11,7 +11,10 @@ use {
 async fn do_ins_album(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
     let albumtype = AlbumType::always(&db, "SomeAlbumType").await.unwrap();
-    let album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
+    let album_id = Album::insert(&db, &albumtype, "Album One").await.unwrap();
+    let album = Album::lookup_by_id(&db, album_id)
+        .await
+        .unwrap();
     assert_eq!(album.get_name(), "Album One");
     assert_eq!(album.get_albumtype_id(), albumtype.get_id());
     assert_eq!(album.get_cover_id(), None);
@@ -23,9 +26,15 @@ async fn ins_album() {
 async fn do_set_album_cover(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
     let blob = include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/src/lib.rs"));
-    let file = File::insert(&db, blob, "text/plain").await.unwrap();
+    let file_id = File::insert(&db, blob, "text/plain").await.unwrap();
+    let file = File::lookup_by_id(&db, file_id)
+        .await
+        .unwrap();
     let albumtype = AlbumType::always(&db, "SomeAlbumType").await.unwrap();
-    let mut album = Album::insert(&db, &albumtype, "Album One").await.unwrap();
+    let album_id = Album::insert(&db, &albumtype, "Album One").await.unwrap();
+    let mut album = Album::lookup_by_id(&db, album_id)
+        .await
+        .unwrap();
     assert_eq!(album.get_name(), "Album One");
     assert_eq!(album.get_albumtype_id(), albumtype.get_id());
     album.set_cover(&db, &file).await.unwrap();

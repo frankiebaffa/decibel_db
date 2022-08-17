@@ -27,6 +27,16 @@ pub struct AlbumTrack {
     last_edit_date: DateTime<Utc>,
 }
 impl AlbumTrack {
+    pub async fn delete(self, db: &SqlitePool) -> Result<()> {
+        query(concat!(
+            "delete ",
+            "from albumtracks ",
+            "where id = $1;"
+        )).bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
     pub fn get_id(&self) -> i64 {
         self.id
     }
@@ -50,6 +60,53 @@ impl AlbumTrack {
     }
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
+    }
+    pub async fn update_version<'a>(
+        &mut self, db: &SqlitePool, version: &'a str
+    ) -> Result<()> {
+        if !self.get_version().eq(&Some(version.to_string())) {
+            let now = Utc::now();
+            query("
+                update albumtracks
+                set
+                    version = $1,
+                    last_edit_date = $2
+                where id = $3
+            ").bind(version)
+                .bind(now)
+                .bind(self.get_id())
+                .execute(db)
+                .await?;
+            self.version = Some(version.to_string());
+            self.last_edit_date = now;
+        }
+        Ok(())
+    }
+    pub async fn update_file_id(
+        &mut self, db: &SqlitePool, file_id: i64
+    ) -> Result<()> {
+        if !self.get_file_id().eq(&Some(file_id)) {
+            let now = Utc::now();
+            query("
+                update albumtracks
+                set
+                    file_id = $1,
+                    last_edit_date = $2
+                where id = $3
+            ").bind(file_id)
+                .bind(now)
+                .bind(self.get_id())
+                .execute(db)
+                .await?;
+            self.file_id = Some(file_id);
+            self.last_edit_date = now;
+        }
+        Ok(())
+    }
+    pub async fn update_file(
+        &mut self, db: &SqlitePool, file: &File
+    ) -> Result<()> {
+        self.update_file_id(db, file.get_id()).await
     }
     pub async fn load_from_album(db: &SqlitePool, album: &Album) -> Result<Vec<Self>> {
         query_as::<_, Self>("
@@ -111,47 +168,5 @@ impl AlbumTrack {
             .await?
             .last_insert_rowid();
         Ok(id)
-    }
-    pub async fn set_version<'a>(
-        &mut self, db: &SqlitePool, version: &'a str
-    ) -> Result<()> {
-        if !self.get_version().eq(&Some(version.to_string())) {
-            let now = Utc::now();
-            query("
-                update albumtracks
-                set
-                    version = $1,
-                    last_edit_date = $2
-                where id = $3
-            ").bind(version)
-                .bind(now)
-                .bind(self.get_id())
-                .execute(db)
-                .await?;
-            self.version = Some(version.to_string());
-            self.last_edit_date = now;
-        }
-        Ok(())
-    }
-    pub async fn set_file(
-        &mut self, db: &SqlitePool, file: &File
-    ) -> Result<()> {
-        if !self.get_file_id().eq(&Some(file.get_id())) {
-            let now = Utc::now();
-            query("
-                update albumtracks
-                set
-                    file_id = $1,
-                    last_edit_date = $2
-                where id = $3
-            ").bind(file.get_id())
-                .bind(now)
-                .bind(self.get_id())
-                .execute(db)
-                .await?;
-            self.file_id = Some(file.get_id());
-            self.last_edit_date = now;
-        }
-        Ok(())
     }
 }

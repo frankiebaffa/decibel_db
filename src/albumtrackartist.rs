@@ -87,5 +87,73 @@ impl AlbumTrackArtist {
             .last_insert_rowid();
         Ok(id)
     }
-    pub async fn load_from_
+    pub async fn load_from_albumtrack_id(
+        db: &SqlitePool,
+        albumtrackartist_id: i64
+    ) -> Result<Vec<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                artist_id,
+                albumtrack_id,
+                artisttype_id,
+                created_date,
+                last_edit_date
+            from albumtrackartist
+            where albumtrack_id = $1
+        ").bind(albumtrackartist_id)
+            .fetch_all(db)
+            .await
+    }
+    pub async fn load_from_albumtrack_ids(
+        db: &SqlitePool,
+        albumtrack_ids: Vec<i64>
+    ) -> Result<Vec<Self>> {
+        match albumtrack_ids.len() {
+            1 => {
+                return Self::load_from_albumtrack_id(
+                    db,
+                    albumtrack_ids.into_iter()
+                        .nth(0)
+                        .unwrap()
+                ).await;
+            },
+            _ => {},
+        }
+        let mut trn = db.begin()
+            .await?;
+        query("
+            create temp table temp.tmp_albumtrack_ids (
+                albumtrack_id integer not null primary key
+            );
+        ").execute(&mut trn)
+            .await?;
+        let mut ids_iter = albumtrack_ids.iter();
+        while let Some(id) = ids_iter.next() {
+            query("
+                insert into temp.tmp_albumtrack_ids (
+                    albumtrack_id
+                ) values (
+                    $1
+                );
+            ").bind(&id)
+                .execute(&mut trn)
+                .await?;
+        }
+        let albums = query_as::<_, Self>("
+            select
+                id,
+                artist_id,
+                albumtrack_id,
+                artisttype_id,
+                created_date,
+                last_edit_date
+            from albumtrackartist as ata
+            join temp.tmp_album_ids as tmp
+            on ata.albumtrack_id = tmp.albumtrack_id;
+        ").fetch_all(&mut trn)
+            .await?;
+        trn.commit().await?;
+        Ok(albums)
+    }
 }

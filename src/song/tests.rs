@@ -17,8 +17,11 @@ async fn ins_song() {
 }
 async fn do_set_song_blurb(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let mut song = Song::insert(&db, "A Song").await.unwrap();
-    let set_res = song.set_blurb(&db, "Hello, World!").await;
+    let song_id = Song::insert(&db, "A Song").await.unwrap();
+    let mut song = Song::lookup_by_id(&db, song_id)
+        .await
+        .unwrap();
+    let set_res = song.update_blurb(&db, "Hello, World!").await;
     assert!(set_res.is_ok());
 }
 #[async_std::test]

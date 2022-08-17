@@ -53,7 +53,6 @@ impl AlbumType {
                 id,
                 name,
                 description,
-                active,
                 created_date,
                 last_edit_date
             from albumtypes
