@@ -48,6 +48,24 @@ impl Artist {
             .fetch_one(db)
             .await
     }
+    pub async fn lookup_by_name(
+        db: &SqlitePool,
+        name_ref: impl AsRef<str>
+    ) -> Result<Self> {
+        let name = name_ref.as_ref();
+        query_as::<_, Self>(concat!(
+            "select ",
+                "id, ",
+                "name, ",
+                "bio, ",
+                "created_date, ",
+                "last_edit_date ",
+            "from artists ",
+            "where name = $1;"
+        )).bind(name)
+            .fetch_one(db)
+            .await
+    }
     pub async fn insert<'a>(db: &SqlitePool, name: &'a str) -> Result<i64> {
         let now = Utc::now();
         let id = query("
