@@ -61,6 +61,7 @@ impl AlbumArtist {
             .fetch_one(db)
             .await
     }
+
     pub async fn load_from_album_id(db: &SqlitePool, id: i64) -> Result<Vec<Self>> {
         query_as::<_, Self>("
             select
@@ -75,6 +76,9 @@ impl AlbumArtist {
         ").bind(id)
             .fetch_all(db)
             .await
+    }
+    pub async fn load_from_album(db: &SqlitePool, album: Album) -> Result<Vec<Self>> {
+        Self::load_from_album_id(db, album.get_id()).await
     }
     pub async fn load_from_artist_id(
         db: &SqlitePool,
@@ -94,8 +98,11 @@ impl AlbumArtist {
             .fetch_all(db)
             .await
     }
-    pub async fn load_from_album(db: &SqlitePool, album: Album) -> Result<Vec<Self>> {
-        Self::load_from_album_id(db, album.get_id()).await
+    pub async fn load_from_artist(
+        db: &SqlitePool, artist: &Artist
+    ) -> Result<Vec<Self>> {
+        Self::load_from_artist_id(db, artist.get_id())
+            .await
     }
     pub async fn insert(
         db: &SqlitePool, artist: &Artist, album: &Album, artisttype: &ArtistType
