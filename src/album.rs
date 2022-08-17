@@ -71,10 +71,20 @@ impl Album {
             .fetch_one(db)
             .await
     }
-    pub async fn load_from_albumartist_ids(
+    pub async fn load_from_ids(
         db: &SqlitePool,
         ids: Vec<i64>,
     ) -> Result<Vec<Self>> {
+        match ids.len() {
+            1 => {
+                let album = Self::lookup_by_id(
+                    db,
+                    ids.into_iter().nth(0).unwrap()
+                ).await?;
+                return Ok(vec![album]);
+            }
+            _ => {},
+        }
         let mut trn = db.begin()
             .await?;
         query("
@@ -115,14 +125,94 @@ impl Album {
     }
     pub async fn load_from_albumartists(
         db: &SqlitePool,
-        album_artists: Vec<AlbumArtist>,
+        albumartist: Vec<AlbumArtist>,
     ) -> Result<Vec<Self>> {
-        Self::load_from_albumartist_ids(
+        Self::load_from_ids(
             db,
-            album_artists.iter()
-                .map(|a| a.get_id())
+            albumartist.iter()
+                .map(|a| a.get_album_id())
                 .collect::<Vec<i64>>()
         ).await
+    }
+    pub async fn load_from_albumartist_and_name(
+        db: &SqlitePool,
+        albumartist: AlbumArtist,
+        name_ref: impl AsRef<str>,
+    ) -> Result<Vec<Self>> {
+        let name = name_ref.as_ref();
+        query_as::<_, Self>("
+            select
+                id,
+                albumtype_id,
+                cover_id,
+                name,
+                blurb,
+                release_date,
+                created_date,
+                last_edit_date
+            from albums as album
+            where album.id = $1
+            and album.name = $2
+        ").bind(albumartist.get_album_id())
+            .bind(name)
+            .fetch_all(db)
+            .await
+    }
+    pub async fn load_from_albumartists_and_name(
+        db: &SqlitePool,
+        ids: Vec<AlbumArtist>,
+        name_ref: impl AsRef<str>,
+    ) -> Result<Vec<Self>> {
+        match ids.len() {
+            1 => {
+                return Self::load_from_albumartist_and_name(
+                    db,
+                    ids.into_iter().nth(0).unwrap(),
+                    name_ref,
+                ).await;
+            },
+            _ => {},
+        }
+        let name = name_ref.as_ref();
+        let mut trn = db.begin()
+            .await?;
+        query("
+            create temp table temp.tmp_album_ids (
+                album_id integer not null primary key
+            );
+        ").execute(&mut trn)
+            .await?;
+        let mut aa_iter = ids.iter();
+        while let Some(albumartist) = aa_iter.next() {
+            query("
+                insert into temp.tmp_album_ids (
+                    album_id
+                ) values (
+                    $1
+                );
+            ").bind(&albumartist.get_album_id())
+                .execute(&mut trn)
+                .await?;
+        }
+        let albums = query_as::<_, Self>("
+            select
+                id,
+                albumtype_id,
+                cover_id,
+                name,
+                blurb,
+                release_date,
+                created_date,
+                last_edit_date
+            from albums as album
+            join temp.tmp_album_ids as tmp
+            on album.id = tmp.album_id
+            and album.name = $1
+        ").bind(name)
+            .fetch_all(&mut trn)
+            .await?;
+        trn.commit().await?;
+        Ok(albums)
     }
     pub async fn insert<'a>(
         db: &SqlitePool, album_type: &AlbumType, name: &'a str
