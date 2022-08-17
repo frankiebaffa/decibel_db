@@ -70,9 +70,12 @@ impl ArtistType {
         }
         Ok(())
     }
-    fn name_query<'a>() -> String {
-        String::from(
-            "select
+    pub async fn lookup_by_id<'a>(
+        db: &SqlitePool,
+        id: i64,
+    ) -> Result<Option<Self>> {
+        query_as::<_, Self>("
+            select
                 id,
                 name,
                 descriptor,
@@ -80,19 +83,27 @@ impl ArtistType {
                 created_date,
                 last_edit_date
             from artisttypes
-            where name = $1;"
-        )
+            where id = $1;
+        ").bind(id)
+            .fetch_optional(db)
+            .await
     }
     pub async fn lookup_by_name<'a>(
         db: &SqlitePool,
-        type_name: &'a str
-    ) -> Result<Self> {
-        query_as::<_, Self>(&Self::name_query()).bind(type_name)
-            .fetch_one(db)
-            .await
-    }
-    pub async fn optional<'a>(db: &SqlitePool, type_name: &'a str) -> Result<Option<Self>> {
-        query_as::<_, Self>(&Self::name_query()).bind(type_name)
+        name_ref: impl AsRef<str>,
+    ) -> Result<Option<Self>> {
+        let name = name_ref.as_ref();
+        query_as::<_, Self>("
+            select
+                id,
+                name,
+                descriptor,
+                description,
+                created_date,
+                last_edit_date
+            from artisttypes
+            where name = $1;
+        ").bind(name)
             .fetch_optional(db)
             .await
     }
@@ -117,14 +128,5 @@ impl ArtistType {
             .await?
             .last_insert_rowid();
         Ok(id)
-    }
-    pub async fn always<'a>(db: &SqlitePool, type_name: &'a str, desc: &'a str) -> Result<Self> {
-        match Self::optional(db, type_name).await? {
-            Some(a) => Ok(a),
-            None => {
-                Self::insert(db, type_name, desc).await?;
-                Ok(Self::lookup_by_name(db, type_name).await?)
-            },
-        }
     }
 }

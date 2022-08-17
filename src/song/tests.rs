@@ -20,6 +20,7 @@ async fn do_set_song_blurb(db: SqlitePool) {
     let song_id = Song::insert(&db, "A Song").await.unwrap();
     let mut song = Song::lookup_by_id(&db, song_id)
         .await
+        .unwrap()
         .unwrap();
     let set_res = song.update_blurb(&db, "Hello, World!").await;
     assert!(set_res.is_ok());

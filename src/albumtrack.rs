@@ -6,6 +6,7 @@ use {
         album::Album,
         file::File,
         song::Song,
+        utils::opt_vec,
     },
     sqlx::{
         FromRow,
@@ -108,8 +109,8 @@ impl AlbumTrack {
     ) -> Result<()> {
         self.update_file_id(db, file.get_id()).await
     }
-    pub async fn load_from_album(db: &SqlitePool, album: &Album) -> Result<Vec<Self>> {
-        query_as::<_, Self>("
+    pub async fn load_from_album(db: &SqlitePool, album: &Album) -> Result<Option<Vec<Self>>> {
+        let albums = query_as::<_, Self>("
             select
                 id,
                 album_id,
@@ -123,9 +124,10 @@ impl AlbumTrack {
             where album_id = $1;
         ").bind(album.get_id())
             .fetch_all(db)
-            .await
+            .await?;
+        Ok(opt_vec(albums))
     }
-    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Option<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -139,7 +141,7 @@ impl AlbumTrack {
             from albumtracks
             where id = $1;
         ").bind(id)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
     pub async fn insert(

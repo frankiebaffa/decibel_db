@@ -9,6 +9,7 @@ use {
         albumartist::AlbumArtist,
         albumtype::AlbumType,
         file::File,
+        utils::opt_vec,
     },
     sqlx::{
         FromRow,
@@ -30,6 +31,16 @@ pub struct Album {
     last_edit_date: DateTime<Utc>,
 }
 impl Album {
+    pub async fn delete(self, db: &SqlitePool) -> Result<()> {
+        query("
+            delete
+            from albums
+            where id = $1
+        ").bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
     pub fn get_id(&self) -> i64 {
         self.id
     }
@@ -54,7 +65,7 @@ impl Album {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Option<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -68,20 +79,24 @@ impl Album {
             from albums
             where id = $1;
         ").bind(id)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
     pub async fn load_from_ids(
         db: &SqlitePool,
         ids: Vec<i64>,
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         match ids.len() {
             1 => {
-                let album = Self::lookup_by_id(
+                let album_opt = Self::lookup_by_id(
                     db,
                     ids.into_iter().nth(0).unwrap()
                 ).await?;
-                return Ok(vec![album]);
+                let albums = match album_opt {
+                    Some(album) => Some(vec![album]),
+                    None => None,
+                };
+                return Ok(albums);
             }
             _ => {},
         }
@@ -121,12 +136,12 @@ impl Album {
         ").fetch_all(&mut trn)
             .await?;
         trn.commit().await?;
-        Ok(albums)
+        Ok(opt_vec(albums))
     }
     pub async fn load_from_albumartists(
         db: &SqlitePool,
         albumartist: Vec<AlbumArtist>,
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         Self::load_from_ids(
             db,
             albumartist.iter()
@@ -138,7 +153,7 @@ impl Album {
         db: &SqlitePool,
         id: i64,
         name_ref: impl AsRef<str>,
-    ) -> Result<Self> {
+    ) -> Result<Option<Self>> {
         let name = name_ref.as_ref();
         query_as::<_, Self>("
             select
@@ -155,14 +170,14 @@ impl Album {
             and album.name = $2
         ").bind(id)
             .bind(name)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
     pub async fn lookup_by_albumartist_and_name(
         db: &SqlitePool,
         albumartist: AlbumArtist,
         name_ref: impl AsRef<str>,
-    ) -> Result<Self> {
+    ) -> Result<Option<Self>> {
         Self::lookup_by_id_and_name(db, albumartist.get_album_id(), name_ref)
             .await
     }
@@ -170,15 +185,19 @@ impl Album {
         db: &SqlitePool,
         ids: Vec<i64>,
         name_ref: impl AsRef<str>,
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         match ids.len() {
             1 => {
-                let album = Self::lookup_by_id_and_name(
+                let album_opt = Self::lookup_by_id_and_name(
                     db,
                     ids.into_iter().nth(0).unwrap(),
                     name_ref,
                 ).await?;
-                return Ok(vec![album]);
+                let albums = match album_opt {
+                    Some(album) => Some(vec![album]),
+                    None => None,
+                };
+                return Ok(albums);
             },
             _ => {},
         }
@@ -221,13 +240,13 @@ impl Album {
             .fetch_all(&mut trn)
             .await?;
         trn.commit().await?;
-        Ok(albums)
+        Ok(opt_vec(albums))
     }
     pub async fn load_from_albumartists_and_name(
         db: &SqlitePool,
         albumartists: Vec<AlbumArtist>,
         name_ref: impl AsRef<str>,
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         Self::load_from_ids_and_name(
             db,
             albumartists.into_iter()

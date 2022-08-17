@@ -47,9 +47,27 @@ impl AlbumType {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    fn name_query() -> String {
-        String::from(
-            "select
+    pub async fn lookup_by_id<'a>(
+        db: &SqlitePool, id: i64
+    ) -> Result<Option<Self>> {
+        query_as::<_, Self>("
+            select
+                id,
+                name,
+                description,
+                created_date,
+                last_edit_date
+            from albumtypes
+            where id = $1;
+        ").bind(id)
+            .fetch_optional(db)
+            .await
+    }
+    pub async fn lookup_by_name<'a>(
+        db: &SqlitePool, name: &'a str
+    ) -> Result<Option<Self>> {
+        query_as::<_, Self>("
+            select
                 id,
                 name,
                 description,
@@ -57,17 +75,7 @@ impl AlbumType {
                 last_edit_date
             from albumtypes
             where name = $1;
-        ")
-    }
-    pub async fn lookup_by_name<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
-        query_as::<_, Self>(&Self::name_query())
-            .bind(name)
-            .fetch_one(db)
-            .await
-    }
-    pub async fn optional<'a>(db: &SqlitePool, name: &'a str) -> Result<Option<Self>> {
-        query_as::<_, Self>(&Self::name_query())
-            .bind(name)
+        ").bind(name)
             .fetch_optional(db)
             .await
     }
@@ -89,15 +97,6 @@ impl AlbumType {
             .await?
             .last_insert_rowid();
         Ok(id)
-    }
-    pub async fn always<'a>(db: &SqlitePool, name: &'a str) -> Result<Self> {
-        match Self::optional(db, name).await? {
-            Some(a) => Ok(a),
-            None => {
-                Self::insert(db, name).await?;
-                Ok(Self::lookup_by_name(db, name).await?)
-            },
-        }
     }
     pub async fn set_description<'a>(
         &mut self, db: &SqlitePool, desc: &'a str

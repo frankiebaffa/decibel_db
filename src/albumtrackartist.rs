@@ -6,6 +6,7 @@ use {
         artist::Artist,
         albumtrack::AlbumTrack,
         artisttype::ArtistType,
+        utils::opt_vec,
     },
     sqlx::{
         FromRow,
@@ -43,7 +44,7 @@ impl AlbumTrackArtist {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Option<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -56,7 +57,7 @@ impl AlbumTrackArtist {
             where id = $1
             limit 1
         ").bind(id)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
     pub async fn insert(
@@ -90,8 +91,8 @@ impl AlbumTrackArtist {
     pub async fn load_from_albumtrack_id(
         db: &SqlitePool,
         albumtrackartist_id: i64
-    ) -> Result<Vec<Self>> {
-        query_as::<_, Self>("
+    ) -> Result<Option<Vec<Self>>> {
+        let albumtrackartists = query_as::<_, Self>("
             select
                 id,
                 artist_id,
@@ -103,12 +104,13 @@ impl AlbumTrackArtist {
             where albumtrack_id = $1
         ").bind(albumtrackartist_id)
             .fetch_all(db)
-            .await
+            .await?;
+        Ok(opt_vec(albumtrackartists))
     }
     pub async fn load_from_albumtrack_ids(
         db: &SqlitePool,
         albumtrack_ids: Vec<i64>
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         match albumtrack_ids.len() {
             1 => {
                 return Self::load_from_albumtrack_id(
@@ -154,6 +156,6 @@ impl AlbumTrackArtist {
         ").fetch_all(&mut trn)
             .await?;
         trn.commit().await?;
-        Ok(albums)
+        Ok(opt_vec(albums))
     }
 }

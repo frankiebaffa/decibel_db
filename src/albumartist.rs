@@ -9,6 +9,7 @@ use {
         artist::Artist,
         artisttype::ArtistType,
         album::Album,
+        utils::opt_vec,
     },
     sqlx::{
         FromRow,
@@ -28,6 +29,16 @@ pub struct AlbumArtist {
     last_edit_date: DateTime<Utc>,
 }
 impl AlbumArtist {
+    pub async fn delete(self, db: &SqlitePool) -> Result<()> {
+        query("
+            delete
+            from albumartists
+            where id = $1
+        ").bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
     pub fn get_id(&self) -> i64 {
         self.id
     }
@@ -46,7 +57,9 @@ impl AlbumArtist {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(
+        db: &SqlitePool, id: i64
+    ) -> Result<Option<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -58,12 +71,14 @@ impl AlbumArtist {
             from albumartists
             where id = $1;
         ").bind(id)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
 
-    pub async fn load_from_album_id(db: &SqlitePool, id: i64) -> Result<Vec<Self>> {
-        query_as::<_, Self>("
+    pub async fn load_from_album_id(
+        db: &SqlitePool, id: i64
+    ) -> Result<Option<Vec<Self>>> {
+        let albumartists = query_as::<_, Self>("
             select
                 id,
                 artist_id,
@@ -75,16 +90,17 @@ impl AlbumArtist {
             where album_id = $1;
         ").bind(id)
             .fetch_all(db)
-            .await
+            .await?;
+        Ok(opt_vec(albumartists))
     }
-    pub async fn load_from_album(db: &SqlitePool, album: Album) -> Result<Vec<Self>> {
+    pub async fn load_from_album(db: &SqlitePool, album: Album) -> Result<Option<Vec<Self>>> {
         Self::load_from_album_id(db, album.get_id()).await
     }
     pub async fn load_from_artist_id(
         db: &SqlitePool,
         id: i64,
-    ) -> Result<Vec<Self>> {
-        query_as::<_, Self>("
+    ) -> Result<Option<Vec<Self>>> {
+        let albumartists = query_as::<_, Self>("
             select
                 id,
                 artist_id,
@@ -96,11 +112,12 @@ impl AlbumArtist {
             where artist_id = $1;
         ").bind(id)
             .fetch_all(db)
-            .await
+            .await?;
+        Ok(opt_vec(albumartists))
     }
     pub async fn load_from_artist(
         db: &SqlitePool, artist: &Artist
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         Self::load_from_artist_id(db, artist.get_id())
             .await
     }

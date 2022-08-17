@@ -5,7 +5,10 @@ use {
         DateTime,
         Utc,
     },
-    crate::albumtrack::AlbumTrack,
+    crate::{
+        albumtrack::AlbumTrack,
+        utils::opt_vec,
+    },
     sqlx::{
         FromRow,
         query,
@@ -23,6 +26,16 @@ pub struct File {
     last_edit_date: DateTime<Utc>,
 }
 impl File {
+    pub async fn delete(self, db: &SqlitePool) -> Result<()> {
+        query("
+            delete
+            from files
+            where id = $1
+        ").bind(self.id)
+            .execute(db)
+            .await?;
+        Ok(())
+    }
     pub fn get_id(&self) -> i64 {
         self.id
     }
@@ -40,7 +53,7 @@ impl File {
     }
     pub async fn load_from_albumtracks(
         db: &SqlitePool, albumtracks: &Vec<AlbumTrack>
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         // begin trn
         let mut trn = db.begin().await?;
         match query("
@@ -100,9 +113,9 @@ impl File {
             },
         }
         trn.commit().await?;
-        Ok(tracks)
+        Ok(opt_vec(tracks))
     }
-    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Option<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -114,7 +127,7 @@ impl File {
             where id = $1
             limit 1
         ").bind(id)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
     pub async fn insert<'a>(

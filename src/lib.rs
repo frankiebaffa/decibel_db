@@ -8,6 +8,7 @@ pub mod artisttype;
 pub mod file;
 pub mod song;
 pub mod migrator;
+pub(crate) mod utils;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]

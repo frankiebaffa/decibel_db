@@ -5,6 +5,7 @@ use {
         DateTime,
         Utc,
     },
+    crate::utils::opt_vec,
     sqlx::{
         FromRow,
         query,
@@ -37,7 +38,7 @@ impl Song {
     pub fn get_last_edit_date(&self) -> DateTime<Utc> {
         self.last_edit_date
     }
-    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Self> {
+    pub async fn lookup_by_id(db: &SqlitePool, id: i64) -> Result<Option<Self>> {
         query_as::<_, Self>("
             select
                 id,
@@ -49,13 +50,13 @@ impl Song {
             where id = $1
             limit 1
         ").bind(id)
-            .fetch_one(db)
+            .fetch_optional(db)
             .await
     }
     pub async fn load_from_ids(
         db: &SqlitePool,
         ids: Vec<i64>,
-    ) -> Result<Vec<Self>> {
+    ) -> Result<Option<Vec<Self>>> {
         let mut trn = db.begin()
             .await?;
         query("
@@ -89,7 +90,7 @@ impl Song {
         ").fetch_all(&mut trn)
             .await?;
         trn.commit().await?;
-        Ok(songs)
+        Ok(opt_vec(songs))
     }
     pub async fn insert<'a>(
         db: &SqlitePool, name: &'a str
