@@ -16,7 +16,6 @@ digraph Music {
 			<tr><td align="left"><b>id</b></td></tr>
 			<tr><td align="left">name</td></tr>
 			<tr><td align="left">bio</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -29,7 +28,6 @@ digraph Music {
 			<tr><td align="left">name</td></tr>
 			<tr><td align="left">descriptor</td></tr>
 			<tr><td align="left">description</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -41,7 +39,6 @@ digraph Music {
 			<tr><td align="left"><b>id</b></td></tr>
 			<tr><td align="left">name</td></tr>
 			<tr><td align="left">description</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -53,7 +50,6 @@ digraph Music {
 			<tr><td align="left"><b>id</b></td></tr>
 			<tr><td align="left">file_blob</td></tr>
 			<tr><td align="left">mime_type</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -65,7 +61,6 @@ digraph Music {
 			<tr><td align="left"><b>id</b></td></tr>
 			<tr><td align="left">name</td></tr>
 			<tr><td align="left">blurb</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -80,7 +75,6 @@ digraph Music {
 			<tr><td align="left"><i>cover_id</i></td></tr>
 			<tr><td align="left">name</td></tr>
 			<tr><td align="left">blurb</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">related_date</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
@@ -96,7 +90,6 @@ digraph Music {
 			<tr><td align="left"><i>artist_id</i></td></tr>
 			<tr><td align="left"><i>album_id</i></td></tr>
 			<tr><td align="left"><i>artisttype_id</i></td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -114,7 +107,6 @@ digraph Music {
 			<tr><td align="left"><i>file_id</i></td></tr>
 			<tr><td align="left">track_number</td></tr>
 			<tr><td align="left">version</td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
@@ -130,7 +122,6 @@ digraph Music {
 			<tr><td align="left"><i>artist_id</i></td></tr>
 			<tr><td align="left"><i>albumtrack_id</i></td></tr>
 			<tr><td align="left"><i>artisttype_id</i></td></tr>
-			<tr><td align="left">active</td></tr>
 			<tr><td align="left">created_date</td></tr>
 			<tr><td align="left">last_edit_date</td></tr>
 		</table>
