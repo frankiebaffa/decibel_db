@@ -1,6 +1,6 @@
 /target
 .env
 *.db
-db_designs/music.db.png
+db_designs/decibel-db.png
 test_dbs/
 Cargo.lock
