@@ -1,10 +1,7 @@
-use {
-    chrono::Utc,
-    sqlx::{
-        Error as SqlxError,
-        SqlitePool,
-        query,
-    },
+use sqlx::{
+    Error as SqlxError,
+    SqlitePool,
+    query,
 };
 pub struct DecibelMigrator;
 impl DecibelMigrator {

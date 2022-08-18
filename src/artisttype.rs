@@ -107,7 +107,11 @@ impl ArtistType {
             .fetch_optional(db)
             .await
     }
-    pub async fn insert<'a>(db: &SqlitePool, type_name: &'a str, desc: &'a str) -> Result<i64> {
+    pub async fn insert<'a>(
+        db: &SqlitePool,
+        type_name: &'a str,
+        descriptor: &'a str
+    ) -> Result<i64> {
         let now = Utc::now();
         let id = query("
             insert into artisttypes (
@@ -122,7 +126,7 @@ impl ArtistType {
                 $3
             )
         ").bind(type_name)
-            .bind(desc)
+            .bind(descriptor)
             .bind(now)
             .execute(db)
             .await?

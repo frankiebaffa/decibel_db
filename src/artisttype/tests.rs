@@ -8,7 +8,11 @@ use {
 };
 async fn do_insert_artist_type(db: SqlitePool) {
     DecibelMigrator::migrate(&db).await.unwrap();
-    let artist_type = ArtistType::always(&db, "Composer", "Composed By").await
+    let _ = ArtistType::insert(&db, "Composer", "Composed By").await
+        .unwrap();
+    let artist_type = ArtistType::lookup_by_name(&db, "Composer")
+        .await
+        .unwrap()
         .unwrap();
     assert_eq!(artist_type.get_name(), "Composer");
 }

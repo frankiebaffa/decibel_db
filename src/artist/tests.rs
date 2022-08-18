@@ -13,6 +13,7 @@ async fn do_insert_artist(db: SqlitePool) {
         .unwrap();
     let artist = Artist::lookup_by_id(&db, artist_id)
         .await
+        .unwrap()
         .unwrap();
     assert_eq!(artist.get_name(), "Test Artist".to_string());
 }
@@ -36,7 +37,7 @@ async fn do_get_all_artists(db: SqlitePool) {
     Artist::insert(&db, "Artist One").await.unwrap();
     Artist::insert(&db, "Artist Two").await.unwrap();
     Artist::insert(&db, "Artist Three").await.unwrap();
-    let artists = Artist::get_all(&db).await.unwrap();
+    let artists = Artist::get_all(&db).await.unwrap().unwrap();
     assert_eq!(artists.len(), 3);
 }
 #[async_std::test]
@@ -48,11 +49,12 @@ async fn do_delete_artist(db: SqlitePool) {
     let artist_id = Artist::insert(&db, "Artist One").await.unwrap();
     let artist = Artist::lookup_by_id(&db, artist_id)
         .await
+        .unwrap()
         .unwrap();
     let id = artist.id.clone();
     artist.delete(&db).await.unwrap();
-    let chk_deleted = Artist::lookup_by_id(&db, id).await;
-    assert!(chk_deleted.is_err());
+    let chk_deleted = Artist::lookup_by_id(&db, id).await.unwrap();
+    assert!(chk_deleted.is_none());
 }
 #[async_std::test]
 async fn delete_artist() {
