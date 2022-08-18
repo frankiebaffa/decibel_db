@@ -120,11 +120,44 @@ impl AlbumArtist {
     pub async fn load_from_album_and_artisttype(
         db: &SqlitePool,
         album: &Album,
-        artisttype: ArtistType,
+        artisttype: &ArtistType,
     ) -> Result<Option<Vec<Self>>> {
         Self::load_from_album_id_and_artisttype_id(
             db,
             album.get_id(),
+            artisttype.get_id(),
+        ).await
+    }
+    pub async fn load_from_artist_id_and_artisttype_id(
+        db: &SqlitePool,
+        artist_id: i64,
+        artisttype_id: i64,
+    ) -> Result<Option<Vec<Self>>> {
+        let albumartists = query_as::<_, Self>("
+            select
+                id,
+                artist_id,
+                album_id,
+                artisttype_id,
+                created_date,
+                last_edit_date
+            from albumartists
+            where artist_id = $1
+            and artisttype_id = $2;
+        ").bind(artist_id)
+            .bind(artisttype_id)
+            .fetch_all(db)
+            .await?;
+        Ok(opt_vec(albumartists))
+    }
+    pub async fn load_from_artist_and_artisttype(
+        db: &SqlitePool,
+        artist: &Artist,
+        artisttype: &ArtistType,
+    ) -> Result<Option<Vec<Self>>> {
+        Self::load_from_artist_id_and_artisttype_id(
+            db,
+            artist.get_id(),
             artisttype.get_id(),
         ).await
     }
